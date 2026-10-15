@@ -34,13 +34,49 @@ lemma originalExponent_le_gammaBH (K : ℝ) : originalExponent K ≤ gammaBH K :
   exact one_div_le_one_div_of_le (by linarith [gammaBH_denom_ge K])
     (originalExponent_denom_ge K)
 
+/-- Restrict the original natural-parameter range to the stronger exponent,
+including the positivity of `R` needed by the real-parameter theorems. -/
+lemma originalExponent_nat_parameters (K : ℝ) (Q R : ℕ)
+    (hQ : (1 : ℝ) ≤ Q) (hQR : (Q : ℝ) ≤ (R : ℝ) ^ originalExponent K) :
+    (1 : ℝ) ≤ R ∧ (Q : ℝ) ≤ (R : ℝ) ^ gammaBH K := by
+  have hRpos : 0 < R := by
+    by_contra hR
+    have he : R = 0 := by omega
+    rw [he, Nat.cast_zero, Real.zero_rpow (originalExponent_pos K).ne'] at hQR
+    linarith
+  have hR1 : (1 : ℝ) ≤ R := by exact_mod_cast hRpos
+  exact ⟨hR1, hQR.trans
+    (Real.rpow_le_rpow_of_exponent_le hR1 (originalExponent_le_gammaBH K))⟩
+
+/-- Absorb the separate thresholds for `Q,R` into the paper's single lower
+bound on `Q`, also ensuring `1 ≤ log Q`. -/
+lemma paper_parameter_bounds (K Q₀ R₀ Q R : ℝ) (hR : 1 ≤ R)
+    (hQ : max Q₀ (max R₀ (Real.exp 1)) ≤ Q) (hQR : Q ≤ R ^ gammaBH K) :
+    Q₀ ≤ Q ∧ R₀ ≤ R ∧ 1 ≤ Real.log Q := by
+  have hQ₀Q : Q₀ ≤ Q := (le_max_left _ _).trans hQ
+  have hR₀Q : R₀ ≤ Q := (le_max_left _ _).trans ((le_max_right _ _).trans hQ)
+  have hexpQ : Real.exp 1 ≤ Q := (le_max_right _ _).trans ((le_max_right _ _).trans hQ)
+  have hQleR : Q ≤ R := hQR.trans (by
+    simpa only [Real.rpow_one] using Real.rpow_le_rpow_of_exponent_le hR
+      (show gammaBH K ≤ 1 by linarith [gammaBH_le K]))
+  refine ⟨hQ₀Q, hR₀Q.trans hQleR, ?_⟩
+  have hh := Real.log_le_log (Real.exp_pos 1) hexpQ
+  simpa only [Real.log_exp] using hh
+
+/-- Replace powers of `log Q + 1` by powers of `log Q` above the paper's
+logarithmic threshold. -/
+lemma log_add_one_pow_le_two_mul_log_pow (Q : ℝ) (hlog : 1 ≤ Real.log Q) (m : ℕ) :
+    (Real.log Q + 1) ^ m ≤ (2 : ℝ) ^ m * (Real.log Q) ^ m := by
+  rw [← mul_pow]
+  exact pow_le_pow_left₀ (by linarith) (by linarith) _
+
 lemma logarithmic_tolerance_conversion (n : ℕ) (c Q : ℝ) (hc : 0 < c)
     (hlog : 1 ≤ Real.log Q) :
     ((2 : ℝ) ^ n / c)⁻¹ * (Real.log Q)⁻¹ ^ n ≤ c / (Real.log Q + 1) ^ n := by
   have hlog0 : 0 < Real.log Q := by linarith
   have hden : 0 < (Real.log Q + 1) ^ n := pow_pos (by linarith) _
   have hp : (Real.log Q + 1) ^ n ≤ (2 * Real.log Q) ^ n :=
-    pow_le_pow_left₀ (by linarith) (by linarith) _
+    by simpa only [mul_pow] using log_add_one_pow_le_two_mul_log_pow Q hlog n
   calc
     _ = c / (2 * Real.log Q) ^ n := by
       rw [inv_div, mul_pow, inv_pow]
@@ -60,16 +96,8 @@ theorem bakerHarman_unequal_weights_log (n : ℕ) (hn : 0 < n) (K : ℝ) :
   refine ⟨max Q₀ (max R₀ (Real.exp 1)), (2 : ℝ) ^ n / c,
     hQ₀.trans (le_max_left _ _), by positivity, ?_⟩
   intro Q R hR hQ hQR a ψ ha hψ hψupper hprod
-  have hQ₀Q : Q₀ ≤ Q := (le_max_left _ _).trans hQ
-  have hR₀Q : R₀ ≤ Q := (le_max_left _ _).trans ((le_max_right _ _).trans hQ)
-  have hexpQ : Real.exp 1 ≤ Q := (le_max_right _ _).trans ((le_max_right _ _).trans hQ)
-  have hQleR : Q ≤ R := hQR.trans (by
-    simpa only [Real.rpow_one] using Real.rpow_le_rpow_of_exponent_le hR
-      (show gammaBH K ≤ 1 by linarith [gammaBH_le K]))
-  have hlog : 1 ≤ Real.log Q := by
-    have hh := Real.log_le_log (Real.exp_pos 1) hexpQ
-    simpa only [Real.log_exp] using hh
-  apply h Q R hQ₀Q (hR₀Q.trans hQleR) hQR a ψ ha hψ
+  obtain ⟨hQ₀Q, hR₀R, hlog⟩ := paper_parameter_bounds K Q₀ R₀ Q R hR hQ hQR
+  apply h Q R hQ₀Q hR₀R hQR a ψ ha hψ
   · intro i
     exact (hψupper i).trans (logarithmic_tolerance_conversion n c Q hc hlog)
   · exact hprod
@@ -77,7 +105,8 @@ theorem bakerHarman_unequal_weights_log (n : ℕ) (hn : 0 < n) (K : ℝ) :
 /-- **Baker–Harman, Theorem 1** (1996), with its explicit exponent (2.1).
 The dimension and growth exponent are positive; `Q,R` are natural numbers;
 the vector may have arbitrary real coordinates. Constants depend only on `n,K`.
-No additional size threshold for `R` or analytic hypothesis is assumed. -/
+No additional size threshold for `R` or analytic hypothesis is assumed.
+The `0 < K` argument retains the paper's stated range. -/
 theorem bakerHarman_theorem_one (n : ℕ) (hn : 0 < n) (K : ℝ) (_hK : 0 < K) :
     ∃ C₁ C₂ : ℝ, 1 ≤ C₁ ∧ 0 < C₂ ∧ ∀ Q R : ℕ, C₁ ≤ Q →
       (Q : ℝ) ≤ (R : ℝ) ^ originalExponent K → ∀ a ψ : Fin n → ℝ,
@@ -88,14 +117,7 @@ theorem bakerHarman_theorem_one (n : ℕ) (hn : 0 < n) (K : ℝ) (_hK : 0 < K) :
   obtain ⟨C₁, C₂, hC₁, hC₂, h⟩ := bakerHarman_unequal_weights_log n hn K
   refine ⟨C₁, C₂, hC₁, hC₂, ?_⟩
   intro Q R hQ hQR a ψ ha hψ hψupper hprod
-  have hRpos : 0 < R := by
-    by_contra hR
-    have he : R = 0 := by omega
-    rw [he, Nat.cast_zero, Real.zero_rpow (originalExponent_pos K).ne'] at hQR
-    linarith
-  have hR1 : (1 : ℝ) ≤ R := by exact_mod_cast hRpos
-  have hQR' : (Q : ℝ) ≤ (R : ℝ) ^ gammaBH K := hQR.trans
-    (Real.rpow_le_rpow_of_exponent_le hR1 (originalExponent_le_gammaBH K))
+  obtain ⟨hR1, hQR'⟩ := originalExponent_nat_parameters K Q R (hC₁.trans hQ) hQR
   obtain ⟨r, hr, hrupper, herr⟩ := h Q R hR1 hQ hQR' a ψ ha hψ hψupper hprod
   exact ⟨r, by exact_mod_cast hr, by exact_mod_cast hrupper, herr⟩
 

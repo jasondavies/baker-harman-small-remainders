@@ -18,7 +18,8 @@ remain available with their existing statements.
 ## Main results
 
 Import `BakerHarman.OriginalTheorem` for Theorem 1, `BakerHarman.TheoremTwo` for
-both theorems, or `BakerHarman` for the entire library. Declarations live in the `BakerHarman` namespace.
+both theorems, or `BakerHarman` for the entire library. Declarations live in the
+`BakerHarman` namespace.
 
 - [`bakerHarman_theorem_one`](BakerHarman/OriginalTheorem.lean): for every positive
   dimension `n` and `K > 0`, there are constants `C₁ ≥ 1` and `C₂ > 0` such that,
@@ -28,14 +29,20 @@ both theorems, or `BakerHarman` for the entire library. Declarations live in the
   `R ≤ r ≤ 2QR` with `distNearestInt (aᵢ/r) ≤ ψᵢ` for every coordinate.
   Here `c(K) = 1/(2^(k+1)-4)` and `k = ⌈1 + max(1,K)⌉`, as in equation (2.1).
   There is no additional hypothesis that `R` exceeds an independent threshold.
-- [`bakerHarman_theorem_two`](BakerHarman/TheoremTwo.lean) gives the improved
-  modulus bound for large weighted vectors. Under the same types of hypotheses,
-  with constants depending only on `n,K`, assume additionally
-  `maxᵢ |aᵢ|/ψᵢ ≥ C₂ RQ(log Q)ⁿ`. Then the modulus satisfies
+- [`bakerHarman_theorem_two`](BakerHarman/TheoremTwo.lean): for positive dimension
+  `n` and `K > 0`, there are constants `C₁ ≥ 1`, `C₂ > 0`, and `C₃ > 0`, depending
+  only on `n,K`. For natural `Q,R` with `C₁ ≤ Q ≤ R^c(K)`, a real vector `a` of
+  Euclidean norm at most `R^K`, and positive tolerances satisfying
+  `ψᵢ ≤ C₂⁻¹(log Q)⁻ⁿ` and `∏ ψᵢ = Q⁻¹`, assume additionally
+  `maxᵢ |aᵢ|/ψᵢ ≥ C₂ RQ(log Q)ⁿ`. Then there is a natural modulus
   `R ≤ r ≤ C₃ RQ(log Q)ⁿ⁻¹ maxᵢ ψᵢ`, with all coordinate errors at most `ψᵢ`.
-  The same `C₂` appears in the tolerance restriction and the large-vector
-  hypothesis, matching equations (1.12)–(1.13). Arbitrary real coordinate signs
-  and dimension one are included.
+  The shared `C₂` matches the printed tolerance bound and equation (1.12).
+  Arbitrary real coordinate signs and dimension one are included.
+
+  The substantive range is **`K > 1`**. The signature retains the paper's `K > 0`,
+  but for the constants chosen in the proof, the hypotheses are incompatible
+  when `0 < K ≤ 1`: the weighted maximum is at most `R^K Q ≤ RQ`, whereas the
+  large-vector hypothesis requires it to exceed `RQ`.
 - [`bakerHarman_theorem_two_log`](BakerHarman/TheoremTwo.lean) gives Theorem 2
   with the stronger exponent `γ(K)` and real `Q,R`. The supporting
   `bakerHarman_large_weighted_vector` retains `log Q + 1`, separate thresholds,
@@ -142,9 +149,11 @@ removes the coordinate-sign restriction. Finally,
 to the paper's `log Q` condition, absorbs the auxiliary `R` threshold into `C₁`,
 and supplies the original rounded exponent and natural-parameter statement.
 
-[`TheoremTwo.lean`](BakerHarman/TheoremTwo.lean) retains the lattice separation
-factor `ρ⁻¹ = maxᵢ ψᵢ` in the sharp lattice bound. The maximum weighted coordinate
-is bounded by the weighted Euclidean norm, so the paper's large-vector hypothesis
+The shared `bakerHarman_weighted_lattice_approximation` in
+[`UnequalWeights.lean`](BakerHarman/UnequalWeights.lean) handles any `ρ ≥ 1` with
+`ρψᵢ ≤ 1`. Theorem 1 chooses `ρ = (log Q + 1)ⁿ/c`, while
+[`TheoremTwo.lean`](BakerHarman/TheoremTwo.lean) chooses `ρ⁻¹ = maxᵢ ψᵢ`.
+The maximum weighted coordinate is bounded by the weighted Euclidean norm, so the paper's large-vector hypothesis
 supplies the required norm threshold. The same logarithmic conversion and
 threshold absorption give Theorem 2 with its original constants and degrees.
 
