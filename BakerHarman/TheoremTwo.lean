@@ -12,8 +12,8 @@ The paper assumes `K > 0`, which the natural-parameter statement preserves.
 For these bounds and natural `Q,R`, the hypotheses are incompatible when `K ≤ 1`:
 `ψᵢ⁻¹ ≤ Q` bounds the weighted maximum by `R^K Q ≤ RQ`, while the required
 lower bound is strictly above `RQ`. `BakerHarman.TheoremTwoRange` proves this
-incompatibility and constructs admissible inputs for every `K > 1` and every
-allowed pair of constants.
+incompatibility and constructs admissible inputs for every `K > 1`, every real
+`C₁`, and every `C₂ > 0`.
 -/
 
 namespace BakerHarman
@@ -31,7 +31,8 @@ lemma coordinateMax_le {n : ℕ} (hn : 0 < n) (f : Fin n → ℝ) (b : ℝ)
 
 /-- The logarithmic hypotheses of Theorem 2 with real parameters and an
 explicit power exponent `γ`. The real-parameter theorem separately requires
-`1 ≤ R`; for natural parameters it follows from the power and threshold bounds. -/
+`1 ≤ R`. The natural-parameter theorem derives this from its positive
+`originalExponent K` and its exported bound `1 ≤ C₁`. -/
 def TheoremTwoAdmissibleReal (n : ℕ) (hn : 0 < n) (K γ C₁ C₂ Q R : ℝ)
     (a ψ : Fin n → ℝ) : Prop :=
   C₁ ≤ Q ∧ Q ≤ R ^ γ ∧

@@ -13,10 +13,6 @@ namespace BakerHarman
 /-- A power range slightly beyond `gammaBH`, funded by the retained analytic saving. -/
 noncomputable def analyticPowerRange (K : ℝ) : ℝ := (26 / 25 : ℝ) * gammaBH K
 
-lemma analyticPowerRange_pos (K : ℝ) : 0 < analyticPowerRange K := by
-  unfold analyticPowerRange
-  positivity [gammaBH_pos K]
-
 lemma gammaBH_lt_analyticPowerRange (K : ℝ) : gammaBH K < analyticPowerRange K := by
   unfold analyticPowerRange
   nlinarith [gammaBH_pos K]
@@ -91,16 +87,5 @@ theorem bakerHarman_slack_large_sum_frequency_log_factor (K : ℝ) (hK : 1 ≤ K
     nlinarith
   have hm := (le_div_iff₀ (abs_pos.mpr hZ)).mp hrecip
   exact (le_div_iff₀ hT).mpr (by nlinarith only [hm])
-
-/-- Fixed-factor version of the large-sum frequency bound. -/
-theorem bakerHarman_slack_large_sum_frequency (K : ℝ) (hK : 1 ≤ K) :
-    ∃ C : ℝ, 0 < C ∧ ∀ B : ℝ,
-      ∀ᶠ R : ℝ in Filter.atTop, ∀ (Q Z T : ℝ) (L U : ℤ),
-        0 < Q → Q ≤ R ^ analyticPowerRange K → |Z| ≤ B * R ^ (K + 1) →
-        R ≤ L → (U : ℝ) ≤ 2 * R → R * Q ^ (-(11 / 10 : ℝ)) ≤ T →
-        T ≤ ‖∑ n ∈ Finset.Icc L U, differencingPhase (Z / n)‖ →
-        |Z| ≤ C * R ^ 2 / T := by
-  obtain ⟨C, hC, hbound⟩ := bakerHarman_slack_large_sum_frequency_log_factor K hK
-  exact ⟨C, hC, fun B => by simpa only [pow_zero, mul_one] using hbound B 0⟩
 
 end BakerHarman

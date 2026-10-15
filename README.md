@@ -38,7 +38,8 @@ both theorems, or `BakerHarman` for the entire library. Import
   `maxᵢ |aᵢ|/ψᵢ ≥ C₂ RQ(log Q)ⁿ`. Then there is a natural modulus
   `R ≤ r ≤ C₃ RQ(log Q)ⁿ⁻¹ maxᵢ ψᵢ`, with all coordinate errors at most `ψᵢ`.
   The shared `C₂` matches the printed tolerance bound and equation (1.12).
-  Arbitrary real coordinate signs and dimension one are included.
+  Arbitrary real coordinate signs and dimension one are included. These input
+  conditions are bundled as `TheoremTwoAdmissible` in the Lean statement.
 
   The substantive range is **`K > 1`**. The signature retains the paper's `K > 0`.
   [`bakerHarman_theorem_two_constants`](BakerHarman/TheoremTwo.lean) additionally
@@ -93,18 +94,26 @@ import-only relocation, and exact dependency closure, including `public` and
 `meta` imports. It works in a standalone checkout or under `.lake/packages`.
 The manifest is a local record: changing both a source and its recorded hashes
 can pass this check, so it does not independently establish upstream provenance.
-To compare the restored source bytes with the recorded commit in a separate
+Upstream paths are fixed by the local module names (with one explicit lattice
+module exception), and the revision must be a full commit hash. To compare the
+restored source bytes with the recorded commit in a separate
 `openai/math` Git checkout, run:
 
 ```sh
 python3 scripts/check_baker_harman_sources.py --upstream-checkout /path/to/math
 ```
 
-The axiom audit selects declarations by their defining `BakerHarman` or
+The checkout must contain the recorded Git commit; its remote URL is not used
+as evidence of provenance. The comparison checks content against that commit,
+not the authenticity of the local manifest or the checkout.
+
+The axiom audit first checks that every local and vendored analytic source
+module is imported. It then selects declarations by their defining `BakerHarman` or
 `BakerHarmanAnalytics` module, including declarations in other namespaces,
 private declarations, and generated declarations. Only `propext`,
 `Classical.choice`, and `Quot.sound` are allowed; proofs contain no `sorry` or
-custom axioms.
+custom axioms. A shared traversal visits each dependency once across all audited
+declarations.
 
 The library has no dependency on the shifted-sets project or its Jacobsthal library.
 

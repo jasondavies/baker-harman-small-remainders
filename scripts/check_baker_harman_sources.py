@@ -78,8 +78,25 @@ def restore_imports(data, rewrite):
     return source.encode()
 
 
+def upstream_path(name):
+    """The extraction's fixed module relocation, independent of manifest paths."""
+    if name == 'BakerHarmanAnalytics/LatticeHyperplaneBasis.lean':
+        return 'lean/OAI/Combinatorics/Progressions/Lattices/LatticeHyperplaneBasis.lean'
+    if not re.fullmatch(r'BakerHarmanAnalytics/[A-Za-z_][A-Za-z_0-9]*\.lean', name):
+        raise ValueError(f'Unsupported local module path: {name}')
+    return 'lean/OAI/NumberTheory/EgyptianFractions/' + name.split('/')[1]
+
+
 def verify(root, upstream_checkout=None):
     manifest = json.loads((root / 'UPSTREAM.json').read_text())
+    revision = manifest['revision']
+    if not re.fullmatch(r'[0-9a-f]{40}', revision):
+        raise ValueError('Upstream revision must be a full 40-character commit hash')
+    if manifest['repository'] != 'https://github.com/openai/math':
+        raise ValueError('Unexpected upstream repository')
+    if manifest['source_root'] != 'lean' or manifest['import_rewrite'] != {
+            'from': 'OAI.NumberTheory.EgyptianFractions.', 'to': 'BakerHarmanAnalytics.'}:
+        raise ValueError('Unexpected import relocation')
     expected = manifest['files']
     actual = {str(p.relative_to(root)) for p in root.rglob('*.lean')
               if '.lake' not in p.relative_to(root).parts}
@@ -89,11 +106,13 @@ def verify(root, upstream_checkout=None):
         raise ValueError('Upstream source set mismatch')
     if set(manifest['config_files']) != {'lakefile.toml'}:
         raise ValueError('Expected a hash for lakefile.toml')
+    for name in expected:
+        if manifest['upstream_files'][name]['path'] != upstream_path(name):
+            raise ValueError(f'Upstream path mismatch: {name}')
     for name, digest in (expected | manifest['config_files']).items():
         if hashlib.sha256((root / name).read_bytes()).hexdigest() != digest:
             raise ValueError(f'Local hash mismatch: {name}')
 
-    revision = manifest['revision']
     if upstream_checkout is not None:
         # Read committed blobs, independently of the checkout's working tree and
         # the hashes recorded in our local manifest.
@@ -107,7 +126,7 @@ def verify(root, upstream_checkout=None):
             raise ValueError(f'Import-relocation hash mismatch: {name}')
         if upstream_checkout is not None:
             blob = subprocess.check_output(
-                ['git', '-C', str(upstream_checkout), 'show', revision + ':' + upstream['path']])
+                ['git', '-C', str(upstream_checkout), 'show', revision + ':' + upstream_path(name)])
             if original != blob:
                 raise ValueError(f'Upstream content mismatch: {name}')
 

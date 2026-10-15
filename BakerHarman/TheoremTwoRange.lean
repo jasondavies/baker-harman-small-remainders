@@ -4,8 +4,8 @@ import BakerHarman.TheoremTwo
 # The substantive growth range of Theorem 2
 
 `TheoremTwoAdmissible` records the natural-parameter theorem's hypotheses on
-`Q,R,a,ψ`. For every positive dimension, every `K > 1`, and every pair of
-allowed constants, admissible inputs exist with arbitrarily large `R`. For
+`Q,R,a,ψ`. For every positive dimension, every `K > 1`, every real `C₁`,
+and every `C₂ > 0`, admissible inputs exist with arbitrarily large `R`. For
 `K ≤ 1`, they do not exist when `exp 1 ≤ C₁` and `1 ≤ C₂`, the bounds exported
 by `bakerHarman_theorem_two_constants`.
 -/
