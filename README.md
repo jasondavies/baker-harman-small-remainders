@@ -118,8 +118,9 @@ Allowing fixed logarithmic factors in the numerator retains saving `23γ(K)/20`.
 dual vector with norm `O(log Q + 1)` and scalar product `O(R(log Q + 1))`.
 
 The earlier induction preserved one power threshold exactly and paid for that
-with larger logarithmic degrees. The new
-[`SharpDimensionInduction.lean`](BakerHarman/SharpDimensionInduction.lean) instead
+with larger logarithmic degrees. Its public statements now specialize
+`SharpDimensionInduction`, so only one induction proof is maintained. The induction
+in [`SharpDimensionInduction.lean`](BakerHarman/SharpDimensionInduction.lean)
 allows a slightly larger power exponent in the lower-dimensional problem,
 remaining strictly inside the analytic range. This absorbs the logarithmic
 covolume increase without spending extra logarithms in the reciprocal scale.

@@ -33,9 +33,12 @@ reciprocal term `R²/|z|` to control large sums as in the original argument.
 This supplies the numerical margin for adapting the proof. The separate
 `BakerHarman.ExponentialSum` module proves the analytic bound using saving
 `6 * gammaBH K / 5`. A Gaussian alternative to Fourier detection is proved in
-`BakerHarman.Lattice.DetectionBudget`. The lattice induction and final equal-weight
-approximation are proved in `BakerHarman.DimensionInduction` and `BakerHarman.EqualWeights`,
-which yield the equal-weight small-remainders theorem.
+`BakerHarman.Lattice.DetectionBudget`. The wider analytic range in
+`BakerHarman.PowerSlack` supports `BakerHarman.SharpDimensionInduction`, which
+recovers the paper's logarithmic degrees. `BakerHarman.UnequalWeights` and
+`BakerHarman.OriginalTheorem` then give the full unequal-weight Theorem 1;
+`BakerHarman.TheoremTwo` retains the lattice separation factor for Theorem 2.
+The earlier `DimensionInduction` and `EqualWeights` interfaces remain available.
 -/
 
 namespace BakerHarman

@@ -5,6 +5,12 @@ cb6cd4f6c95edab17f182c0dd169625b83c63ad2.
 The extraction changes module paths and the ShiftedGcd namespace to BakerHarman,
 and separates the two shared definitions; it does not change the proof arguments.
 
+Subsequent development in this repository adds the full unequal-weight Theorems 1
+and 2, including weighted simultaneous approximation and a sharper lattice
+induction with the original logarithmic degrees. Earlier theorem interfaces are
+retained as specializations where the newer results subsume them. These additions
+and refactorings go beyond the original extraction described above.
+
 This project includes and adapts portions of OpenAI's math repository:
 https://github.com/openai/math
 Revision: 1581d4cbdd69a0faf34b2089614fe2a814316a6a
