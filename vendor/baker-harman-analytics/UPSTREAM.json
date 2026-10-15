@@ -97,5 +97,8 @@
   "import_rewrite": {
     "from": "OAI.NumberTheory.EgyptianFractions.",
     "to": "BakerHarmanAnalytics."
+  },
+  "config_files": {
+    "lakefile.toml": "dbdbc481ea24c3280689d4c6cbca539168cb9e933ee648c8fb4d0c6d4b046777"
   }
 }

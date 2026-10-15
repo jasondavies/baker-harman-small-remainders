@@ -45,11 +45,11 @@ both theorems, or `BakerHarman` for the entire library. Import
   exports `exp 1 ≤ C₁` and `1 ≤ C₂`; the original interface is its corollary.
 - [`TheoremTwoRange.lean`](BakerHarman/TheoremTwoRange.lean) formalises both sides
   of the K-range claim using `TheoremTwoAdmissible`, which records the theorem's
-  `Q,R,a,ψ` hypotheses. `bakerHarman_theorem_two_admissible` connects this predicate
-  to the theorem. `theoremTwo_not_admissible` rules out inputs for `K ≤ 1`
+  `Q,R,a,ψ` hypotheses shared by the natural-parameter theorem variants.
+  `theoremTwo_not_admissible` rules out inputs for `K ≤ 1`
   whenever `exp 1 ≤ C₁` and `1 ≤ C₂`.
   `theoremTwo_admissible_exists` supplies inputs for every `K > 1`, every
-  `C₁ ≥ 1`, and every `C₂ > 0`, with arbitrarily large natural `R`. It uses equal
+  real `C₁`, and every `C₂ > 0`, with arbitrarily large natural `R`. It uses equal
   tolerances and a vector supported in one coordinate.
 - [`bakerHarman_theorem_two_log`](BakerHarman/TheoremTwo.lean) gives Theorem 2
   with the stronger exponent `γ(K)` and real `Q,R`. The supporting
@@ -84,14 +84,27 @@ lake exe cache get
 lake build
 python3 scripts/check_baker_harman_sources.py
 lake env lean scripts/CheckAxioms.lean
+python3 -m unittest discover -s scripts -p 'test_*.py'
 ```
 
-The source check verifies the sixteen vendored files, upstream and local hashes,
-import-only relocation, and exact dependency closure. It works both in a standalone
-checkout and under Lake's `.lake/packages` directory. The axiom audit checks every
-library declaration, including private/generated declarations, and the imported
-`OAI.Problem337` and `OAI.Erdos3` declarations. Only `propext`, `Classical.choice`,
-and `Quot.sound` are allowed; proofs contain no `sorry` or custom axioms.
+The source check detects local drift by comparing the sixteen vendored files
+and `lakefile.toml` against `UPSTREAM.json`. It checks the recorded hashes,
+import-only relocation, and exact dependency closure, including `public` and
+`meta` imports. It works in a standalone checkout or under `.lake/packages`.
+The manifest is a local record: changing both a source and its recorded hashes
+can pass this check, so it does not independently establish upstream provenance.
+To compare the restored source bytes with the recorded commit in a separate
+`openai/math` Git checkout, run:
+
+```sh
+python3 scripts/check_baker_harman_sources.py --upstream-checkout /path/to/math
+```
+
+The axiom audit selects declarations by their defining `BakerHarman` or
+`BakerHarmanAnalytics` module, including declarations in other namespaces,
+private declarations, and generated declarations. Only `propext`,
+`Classical.choice`, and `Quot.sound` are allowed; proofs contain no `sorry` or
+custom axioms.
 
 The library has no dependency on the shifted-sets project or its Jacobsthal library.
 

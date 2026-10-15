@@ -1,5 +1,4 @@
 import BakerHarman.TheoremTwo
-import Mathlib.Analysis.Complex.ExponentialBounds
 
 /-!
 # The substantive growth range of Theorem 2
@@ -12,30 +11,6 @@ by `bakerHarman_theorem_two_constants`.
 -/
 
 namespace BakerHarman
-
-/-- The `Q,R,a,ψ` hypotheses of the natural-parameter Theorem 2, independently
-of any particular choice of its existential constants. Conditions on `K,C₁,C₂`
-are supplied separately by the callers. -/
-def TheoremTwoAdmissible (n : ℕ) (hn : 0 < n) (K C₁ C₂ : ℝ)
-    (Q R : ℕ) (a ψ : Fin n → ℝ) : Prop :=
-  C₁ ≤ Q ∧ (Q : ℝ) ≤ (R : ℝ) ^ originalExponent K ∧
-    Real.sqrt (∑ i, (a i) ^ 2) ≤ (R : ℝ) ^ K ∧
-    (∀ i, 0 < ψ i) ∧ (∀ i, ψ i ≤ C₂⁻¹ * (Real.log Q)⁻¹ ^ n) ∧
-    (∏ i, ψ i) = (Q : ℝ)⁻¹ ∧
-    C₂ * R * Q * (Real.log Q) ^ n ≤ coordinateMax hn (fun i => |a i| / ψ i)
-
-/-- Theorem 2 expressed using `TheoremTwoAdmissible`. This connects the
-K-range lemmas to the theorem's hypotheses, with explicit constant bounds. -/
-theorem bakerHarman_theorem_two_admissible (n : ℕ) (hn : 0 < n) (K : ℝ) (hK : 0 < K) :
-    ∃ C₁ C₂ C₃ : ℝ, Real.exp 1 ≤ C₁ ∧ 1 ≤ C₂ ∧ 0 < C₃ ∧
-      ∀ (Q R : ℕ) (a ψ : Fin n → ℝ), TheoremTwoAdmissible n hn K C₁ C₂ Q R a ψ →
-      ∃ r : ℕ, R ≤ r ∧
-        (r : ℝ) ≤ C₃ * R * Q * (Real.log Q) ^ (n - 1) * coordinateMax hn ψ ∧
-        ∀ i, distNearestInt (a i / r) ≤ ψ i := by
-  obtain ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, h⟩ := bakerHarman_theorem_two_constants n hn K hK
-  refine ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, ?_⟩
-  rintro Q R a ψ ⟨hQ, hQR, ha, hψ, hψupper, hprod, hlarge⟩
-  exact h Q R hQ hQR a ψ ha hψ hψupper hprod hlarge
 
 /-- The hypotheses cannot hold for `K ≤ 1` when the constants satisfy the
 bounds exported by `bakerHarman_theorem_two_constants`. -/
@@ -74,11 +49,11 @@ theorem theoremTwo_not_admissible (n : ℕ) (hn : 0 < n) (K C₁ C₂ : ℝ)
   have hh := mul_lt_mul_of_pos_left hcoef (mul_pos hR0 hQ0)
   nlinarith only [hh, hlarge.trans hmax]
 
-/-- For every positive dimension, `K > 1`, and any allowed constants, the
+/-- For every positive dimension, `K > 1`, any `C₁`, and any `C₂ > 0`, the
 hypotheses have witnesses with arbitrarily large natural `R`. Equal tolerances
 and a vector supported in one coordinate suffice. -/
 theorem theoremTwo_admissible_exists (n : ℕ) (hn : 0 < n) (K : ℝ) (hK : 1 < K)
-    (C₁ C₂ : ℝ) (hC₁ : 1 ≤ C₁) (hC₂ : 0 < C₂) (Rmin : ℕ) :
+    (C₁ C₂ : ℝ) (hC₂ : 0 < C₂) (Rmin : ℕ) :
     ∃ (Q R : ℕ) (a ψ : Fin n → ℝ), Rmin ≤ R ∧
       TheoremTwoAdmissible n hn K C₁ C₂ Q R a ψ := by
   have hevent : ∀ᶠ Q : ℕ in Filter.atTop,
@@ -90,7 +65,7 @@ theorem theoremTwo_admissible_exists (n : ℕ) (hn : 0 < n) (K : ℝ) (hK : 1 < 
     exact_mod_cast (le_max_right 2 ⌈C₁⌉₊).trans (le_max_right Q₀ _))
   have hQ2 : (2 : ℝ) ≤ Q := by
     exact_mod_cast (le_max_left 2 ⌈C₁⌉₊).trans (le_max_right Q₀ _)
-  have hQ0 : (0 : ℝ) < Q := lt_of_lt_of_le zero_lt_one (hC₁.trans hQlower)
+  have hQ0 : (0 : ℝ) < Q := by linarith
   have hlog0 : 0 < Real.log Q := Real.log_pos (by linarith)
   let ε := equalWeight n Q
   have hε : 0 < ε := equalWeight_pos n hQ0
@@ -131,8 +106,7 @@ theorem theoremTwo_admissible_exists (n : ℕ) (hn : 0 < n) (K : ℝ) (hK : 1 < 
   · apply le_trans _ (le_coordinateMax hn (fun i => |a i| / ε) k)
     simp only [a, Pi.single_eq_same, abs_of_pos (mul_pos hD hR0)]
     dsimp [D]
+    apply le_of_eq
     field_simp
-    ring_nf
-    rfl
 
 end BakerHarman
