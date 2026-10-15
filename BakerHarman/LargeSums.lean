@@ -21,8 +21,7 @@ theorem bakerHarman_analytic_power_absorbed (K C : ℝ) :
   filter_upwards [bakerHarman_slack_power_absorbed K C,
     Filter.eventually_ge_atTop (1 : ℝ)] with R h hR
   intro Q hQ hQR
-  exact h Q hQ (hQR.trans (Real.rpow_le_rpow_of_exponent_le hR
-    (gammaBH_lt_analyticPowerRange K).le))
+  exact h Q hQ (hQR.trans (gammaBH_rpow_le_analyticPowerRange K R hR))
 
 /-- A sum of size at least `T`, above the small-sum cutoff, has numerator
 at most a constant times `R²/T`. Fixed logarithmic factors are permitted in
@@ -38,8 +37,7 @@ theorem bakerHarman_large_sum_frequency_log_factor (K : ℝ) (hK : 1 ≤ K) :
   refine ⟨C, hC, fun B n => ?_⟩
   filter_upwards [h B n, Filter.eventually_ge_atTop (1 : ℝ)] with R h hR
   intro Q Z T L U hQ hQR
-  exact h Q Z T L U hQ (hQR.trans (Real.rpow_le_rpow_of_exponent_le hR
-    (gammaBH_lt_analyticPowerRange K).le))
+  exact h Q Z T L U hQ (hQR.trans (gammaBH_rpow_le_analyticPowerRange K R hR))
 
 /-- Fixed-factor version of the large-sum frequency bound. -/
 theorem bakerHarman_large_sum_frequency (K : ℝ) (hK : 1 ≤ K) :

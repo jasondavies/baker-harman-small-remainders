@@ -25,6 +25,11 @@ lemma analyticPowerRange_le_one (K : ℝ) : analyticPowerRange K ≤ 1 := by
   unfold analyticPowerRange
   linarith [gammaBH_le K]
 
+/-- Transfer the shifted-sets power bound to the wider analytic range. -/
+lemma gammaBH_rpow_le_analyticPowerRange (K R : ℝ) (hR : 1 ≤ R) :
+    R ^ gammaBH K ≤ R ^ analyticPowerRange K :=
+  Real.rpow_le_rpow_of_exponent_le hR (gammaBH_lt_analyticPowerRange K).le
+
 open OAI.Problem337
 
 /-- Absorb the power term after allowing fixed factors in the numerator range. -/

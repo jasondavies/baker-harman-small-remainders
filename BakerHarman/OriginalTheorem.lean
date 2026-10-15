@@ -48,10 +48,21 @@ lemma originalExponent_nat_parameters (K : ℝ) (Q R : ℕ)
   exact ⟨hR1, hQR.trans
     (Real.rpow_le_rpow_of_exponent_le hR1 (originalExponent_le_gammaBH K))⟩
 
+/-- A single lower bound on `Q` that absorbs the separate `Q,R` thresholds
+and ensures `1 ≤ log Q`. -/
+noncomputable def logarithmicThreshold (Q₀ R₀ : ℝ) : ℝ :=
+  max Q₀ (max R₀ (Real.exp 1))
+
+lemma logarithmicThreshold_ge_exp (Q₀ R₀ : ℝ) : Real.exp 1 ≤ logarithmicThreshold Q₀ R₀ :=
+  (le_max_right _ _).trans (le_max_right _ _)
+
+lemma logarithmicThreshold_ge_one (Q₀ R₀ : ℝ) : 1 ≤ logarithmicThreshold Q₀ R₀ :=
+  (Real.one_le_exp (by norm_num)).trans (logarithmicThreshold_ge_exp Q₀ R₀)
+
 /-- Absorb the separate thresholds for `Q,R` into the paper's single lower
 bound on `Q`, also ensuring `1 ≤ log Q`. -/
 lemma logarithmic_parameter_bounds (γ Q₀ R₀ Q R : ℝ) (hγ : γ ≤ 1) (hR : 1 ≤ R)
-    (hQ : max Q₀ (max R₀ (Real.exp 1)) ≤ Q) (hQR : Q ≤ R ^ γ) :
+    (hQ : logarithmicThreshold Q₀ R₀ ≤ Q) (hQR : Q ≤ R ^ γ) :
     Q₀ ≤ Q ∧ R₀ ≤ R ∧ 1 ≤ Real.log Q := by
   have hQ₀Q : Q₀ ≤ Q := (le_max_left _ _).trans hQ
   have hR₀Q : R₀ ≤ Q := (le_max_left _ _).trans ((le_max_right _ _).trans hQ)
@@ -62,14 +73,6 @@ lemma logarithmic_parameter_bounds (γ Q₀ R₀ Q R : ℝ) (hγ : γ ≤ 1) (hR
   refine ⟨hQ₀Q, hR₀Q.trans hQleR, ?_⟩
   have hh := Real.log_le_log (Real.exp_pos 1) hexpQ
   simpa only [Real.log_exp] using hh
-
-/-- Compatibility specialization of `logarithmic_parameter_bounds` to
-`gammaBH K`. -/
-lemma paper_parameter_bounds (K Q₀ R₀ Q R : ℝ) (hR : 1 ≤ R)
-    (hQ : max Q₀ (max R₀ (Real.exp 1)) ≤ Q) (hQR : Q ≤ R ^ gammaBH K) :
-    Q₀ ≤ Q ∧ R₀ ≤ R ∧ 1 ≤ Real.log Q := by
-  exact logarithmic_parameter_bounds (gammaBH K) Q₀ R₀ Q R
-    (by linarith [gammaBH_le K]) hR hQ hQR
 
 /-- Replace powers of `log Q + 1` by powers of `log Q` above the paper's
 logarithmic threshold. -/
@@ -100,10 +103,11 @@ theorem bakerHarman_unequal_weights_log (n : ℕ) (hn : 0 < n) (K : ℝ) :
       ∃ r : ℕ, R ≤ r ∧ (r : ℝ) ≤ 2 * Q * R ∧
         ∀ i, distNearestInt (a i / r) ≤ ψ i := by
   obtain ⟨c, Q₀, R₀, hc, hQ₀, hR₀, h⟩ := bakerHarman_unequal_weights n hn K
-  refine ⟨max Q₀ (max R₀ (Real.exp 1)), (2 : ℝ) ^ n / c,
-    hQ₀.trans (le_max_left _ _), by positivity, ?_⟩
+  refine ⟨logarithmicThreshold Q₀ R₀, (2 : ℝ) ^ n / c,
+    logarithmicThreshold_ge_one Q₀ R₀, by positivity, ?_⟩
   intro Q R hR hQ hQR a ψ ha hψ hψupper hprod
-  obtain ⟨hQ₀Q, hR₀R, hlog⟩ := paper_parameter_bounds K Q₀ R₀ Q R hR hQ hQR
+  obtain ⟨hQ₀Q, hR₀R, hlog⟩ :=
+    logarithmic_parameter_bounds (gammaBH K) Q₀ R₀ Q R (by linarith [gammaBH_le K]) hR hQ hQR
   apply h Q R hQ₀Q hR₀R hQR a ψ ha hψ
   · intro i
     exact (hψupper i).trans (logarithmic_tolerance_conversion n c Q hc hlog)

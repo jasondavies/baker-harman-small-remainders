@@ -84,11 +84,12 @@ theorem bakerHarman_theorem_two_log_constants (n : ℕ) (hn : 0 < n) (K : ℝ) :
   let C₂ := max 1 (A * (2 : ℝ) ^ n)
   have hC₂1 : 1 ≤ C₂ := le_max_left _ _
   have hC₂ : 0 < C₂ := by linarith
-  refine ⟨max Q₀ (max R₀ (Real.exp 1)), C₂, B * (2 : ℝ) ^ (n - 1),
-    (le_max_right _ _).trans (le_max_right _ _), hC₂1, by positivity, ?_⟩
+  refine ⟨logarithmicThreshold Q₀ R₀, C₂, B * (2 : ℝ) ^ (n - 1),
+    logarithmicThreshold_ge_exp Q₀ R₀, hC₂1, by positivity, ?_⟩
   intro Q R hR hQ hQR a ψ ha hψ hψupper hprod hlarge
   have hR0 : 0 < R := by linarith
-  obtain ⟨hQ₀Q, hR₀R, hlog⟩ := paper_parameter_bounds K Q₀ R₀ Q R hR hQ hQR
+  obtain ⟨hQ₀Q, hR₀R, hlog⟩ :=
+    logarithmic_parameter_bounds (gammaBH K) Q₀ R₀ Q R (by linarith [gammaBH_le K]) hR hQ hQR
   have hQ1 : 1 ≤ Q := hQ₀.trans hQ₀Q
   have hQ0 : 0 < Q := by linarith
   have hlog0 : 0 < Real.log Q := by linarith

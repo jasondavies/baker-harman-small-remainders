@@ -1,11 +1,11 @@
 import BakerHarman.WeightedSmallVector
-import BakerHarman.ReciprocalRounding
 
 /-!
-# The small-vector reciprocal approximation step
+# Small-vector approximation with equal tolerances
 
-The largest coordinate determines the reciprocal modulus. The other coordinates
-are approximated simultaneously before rounding that modulus to an integer.
+Specialize `small_vector_weighted_reciprocal` to a common tolerance and box
+size. The simultaneous approximation and rounding argument is proved in
+`WeightedSmallVector`.
 -/
 
 namespace BakerHarman

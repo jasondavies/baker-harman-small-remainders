@@ -1,14 +1,10 @@
 import BakerHarman.SlackDimensionOne
-import BakerHarman.SmallDualVector
-import BakerHarman.Lattice.DualLowerBound
-import BakerHarman.Lattice.CovolumeLowerBound
 
 /-!
-# The one-dimensional reciprocal approximation step
+# One-dimensional approximation at the shifted-sets exponent
 
-A failed approximation produces a dual vector with small scalar product.
-In dimension one that scalar product, together with the dual norm lower bound,
-forces the original vector to be small. This is the base of dimension induction.
+Specialize `bakerHarman_slack_dimension_one` to `Q ≤ R ^ gammaBH K`.
+The dual-vector argument is proved in `SlackDimensionOne`.
 -/
 
 namespace BakerHarman
@@ -27,7 +23,6 @@ theorem bakerHarman_dimension_one (K : ℝ) (hK : 1 ≤ K) :
   obtain ⟨A, Q₀, R₀, hA, hQ₀, hR₀, h⟩ := bakerHarman_slack_dimension_one K hK
   refine ⟨A, Q₀, R₀, hA, hQ₀, hR₀, ?_⟩
   intro R hR Q hQ hQR
-  exact h R hR Q hQ (hQR.trans (Real.rpow_le_rpow_of_exponent_le
-    (by linarith) (gammaBH_lt_analyticPowerRange K).le))
+  exact h R hR Q hQ (hQR.trans (gammaBH_rpow_le_analyticPowerRange K R (by linarith)))
 
 end BakerHarman

@@ -1,12 +1,10 @@
 import BakerHarman.WeightedDirichlet
-import BakerHarman.Defs
 
 /-!
-# Simultaneous Dirichlet approximation
+# Simultaneous Dirichlet approximation with equal tolerances
 
-Partition the fractional-part cube into `M ^ card ι` boxes and apply the
-pigeonhole principle to one more multiple. The denominator and every coordinate
-error are explicit, as required for the final reciprocal approximation argument.
+Specialize `weighted_simultaneous_dirichlet` to a common box size `M`.
+The rectangular pigeonhole argument is proved in `WeightedDirichlet`.
 -/
 
 namespace BakerHarman

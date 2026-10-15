@@ -46,7 +46,8 @@ both theorems, or `BakerHarman` for the entire library. Import
 - [`TheoremTwoRange.lean`](BakerHarman/TheoremTwoRange.lean) formalises both sides
   of the K-range claim using `TheoremTwoAdmissible`, which records the theorem's
   `Q,R,a,ψ` hypotheses. `bakerHarman_theorem_two_admissible` connects this predicate
-  to the theorem. `theoremTwo_not_admissible` rules out inputs for `K ≤ 1` whenever `exp 1 ≤ C₁` and `1 ≤ C₂`.
+  to the theorem. `theoremTwo_not_admissible` rules out inputs for `K ≤ 1`
+  whenever `exp 1 ≤ C₁` and `1 ≤ C₂`.
   `theoremTwo_admissible_exists` supplies inputs for every `K > 1`, every
   `C₁ ≥ 1`, and every `C₂ > 0`, with arbitrarily large natural `R`. It uses equal
   tolerances and a vector supported in one coordinate.
@@ -132,8 +133,9 @@ Allowing fixed logarithmic factors in the numerator retains saving `23γ(K)/20`.
 dual vector with norm `O(log Q + 1)` and scalar product `O(R(log Q + 1))`.
 
 The earlier induction preserved one power threshold exactly and paid for that
-with larger logarithmic degrees. Its public statements now specialize
-`SharpDimensionInduction`, so only one induction proof is maintained. The induction
+with larger logarithmic degrees. `DimensionInduction` now only specializes the
+sharp theorem to `gammaBH K`; its obsolete induction steps and logarithmic
+rescaling budgets have been removed. The induction
 in [`SharpDimensionInduction.lean`](BakerHarman/SharpDimensionInduction.lean)
 allows a slightly larger power exponent in the lower-dimensional problem,
 remaining strictly inside the analytic range. This absorbs the logarithmic
@@ -165,8 +167,8 @@ constant. It is distinct from the paper-facing constant `C₂`.
 [`TheoremTwo.lean`](BakerHarman/TheoremTwo.lean) chooses `ρ⁻¹ = maxᵢ ψᵢ`.
 The maximum weighted coordinate is bounded by the weighted Euclidean norm, so
 the paper's large-vector hypothesis supplies the required norm threshold. The
-same logarithmic conversion and
-threshold absorption give Theorem 2 with its original constants and degrees.
+same logarithmic conversion and threshold absorption give Theorem 2 with its
+original constants and degrees.
 
 ## Provenance and license
 

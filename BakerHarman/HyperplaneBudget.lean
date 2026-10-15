@@ -1,111 +1,14 @@
-import BakerHarman.LogFactors
+import BakerHarman.Defs
 
 /-!
-# Logarithmic budgets for dimension induction
+# Numerical budgets for hyperplane projection
 
-The Gaussian frequency radius grows like `log Q + 1`. Increasing the logarithmic
-power in the new reciprocal scale absorbs this radius while retaining exactly
-the same power condition `Q ≤ R ^ γ` in the lower-dimensional problem.
+These estimates control vector growth, logarithmic products, and projection
+error in the sharp dimension induction. Power-range slack is handled by
+`SharpDimensionInduction` itself.
 -/
 
 namespace BakerHarman
-
-/-- A strictly larger logarithmic exponent absorbs every fixed coefficient. -/
-theorem log_add_one_rpow_dominates (C a b : ℝ) (hab : b < a) :
-    ∀ᶠ Q : ℝ in Filter.atTop,
-      C * (Real.log Q + 1) ^ b ≤ (Real.log Q + 1) ^ a := by
-  have hL : Filter.Tendsto (fun Q : ℝ => Real.log Q + 1) Filter.atTop Filter.atTop :=
-    Filter.tendsto_atTop_add_const_right _ _ Real.tendsto_log_atTop
-  have h := ((tendsto_rpow_atTop (sub_pos.mpr hab)).comp hL).eventually_ge_atTop C
-  filter_upwards [h, Filter.eventually_ge_atTop (1 : ℝ)] with Q h hQ
-  have hL0 : 0 < Real.log Q + 1 := by linarith [Real.log_nonneg hQ]
-  calc
-    _ ≤ (Real.log Q + 1) ^ (a - b) * (Real.log Q + 1) ^ b :=
-      mul_le_mul_of_nonneg_right h (Real.rpow_nonneg hL0.le _)
-    _ = _ := by rw [← Real.rpow_add hL0]; congr 1; ring
-
-/-- A logarithmic degree depending only on the fixed power exponent suffices
-for every fixed scaling and detection constant. -/
-theorem exists_hyperplane_log_budget (γ : ℝ) (hγ : 0 < γ) :
-    ∃ J : ℕ, 1 ≤ J ∧ ∀ A C c : ℝ, 0 < A → 0 < C → 0 < c →
-      ∀ᶠ Q : ℝ in Filter.atTop, 1 ≤ Q ∧
-        max c 2 * C * (Real.log Q + 1) ≤ (Real.log Q + 1) ^ J ∧
-        A * (C * (Real.log Q + 1)) ^ (γ + 1) ≤ ((Real.log Q + 1) ^ J) ^ γ ∧
-        A * C * (Real.log Q + 1) ≤ Q := by
-  obtain ⟨J, hJ⟩ := exists_nat_gt (max 1 ((γ + 1) / γ))
-  have hJ1 : (1 : ℝ) < J := lt_of_le_of_lt (le_max_left _ _) hJ
-  have hJγ : γ + 1 < (J : ℝ) * γ :=
-    (div_lt_iff₀ hγ).mp (lt_of_le_of_lt (le_max_right _ _) hJ)
-  refine ⟨J, by exact_mod_cast hJ1.le, ?_⟩
-  intro A C c _ hC _
-  filter_upwards [log_add_one_rpow_dominates (max c 2 * C) J 1 hJ1,
-    log_add_one_rpow_dominates (A * C ^ (γ + 1)) ((J : ℝ) * γ) (γ + 1) hJγ,
-    log_add_one_pow_absorbed (A * C) 1 1 (by norm_num),
-    Filter.eventually_ge_atTop (1 : ℝ)] with Q hscale hpower hlog hQ
-  have hL0 : 0 ≤ Real.log Q + 1 := by linarith [Real.log_nonneg hQ]
-  refine ⟨hQ, ?_, ?_, ?_⟩
-  · simpa only [Real.rpow_natCast, Real.rpow_one] using hscale
-  · rw [Real.mul_rpow hC.le hL0, ← mul_assoc, ← Real.rpow_natCast (Real.log Q + 1) J,
-      ← Real.rpow_mul hL0]
-    exact hpower
-  · simpa only [pow_one, Real.rpow_one] using hlog
-
-/-- The numerical change of scales preserves the power range and gives uniform
-control of the new logarithm. The covolume multiplier is denoted by `A`. -/
-theorem hyperplane_rescaling_bounds (γ R Q p A C c : ℝ) (J : ℕ)
-    (hγ : 0 < γ) (hR : 0 < R) (hQ : 1 ≤ Q) (hp : 0 < p)
-    (hA : 0 < A) (hC : 0 < C) (hc : 0 < c)
-    (hQR : Q ≤ R ^ γ) (hpC : p ≤ C * (Real.log Q + 1))
-    (hscale : max c 2 * C * (Real.log Q + 1) ≤ (Real.log Q + 1) ^ J)
-    (hpower : A * (C * (Real.log Q + 1)) ^ (γ + 1) ≤ ((Real.log Q + 1) ^ J) ^ γ)
-    (hlog : A * C * (Real.log Q + 1) ≤ Q) :
-    c * R ≤ R / p * (Real.log Q + 1) ^ J ∧
-      2 * C * R * (Real.log Q + 1) / p ≤ R / p * (Real.log Q + 1) ^ J ∧
-      A * p * Q ≤ (R / p * (Real.log Q + 1) ^ J) ^ γ ∧
-      Real.log (A * p * Q) + 1 ≤ 2 * (Real.log Q + 1) := by
-  let L := Real.log Q + 1
-  have hL : 0 < L := by dsimp [L]; linarith [Real.log_nonneg hQ]
-  have hQ0 : 0 < Q := lt_of_lt_of_le zero_lt_one hQ
-  have hcp : c * p ≤ L ^ J := by
-    calc
-      _ ≤ c * (C * L) := mul_le_mul_of_nonneg_left hpC hc.le
-      _ ≤ max c 2 * C * L := by
-        nlinarith [mul_le_mul_of_nonneg_right (le_max_left c 2) (mul_nonneg hC.le hL.le)]
-      _ ≤ _ := hscale
-  have htwo : 2 * C * L ≤ L ^ J := by
-    calc
-      _ ≤ max c 2 * C * L := by
-        nlinarith [mul_le_mul_of_nonneg_right (le_max_right c 2) (mul_nonneg hC.le hL.le)]
-      _ ≤ _ := hscale
-  have hpow : A * p ^ (γ + 1) ≤ (L ^ J) ^ γ :=
-    (mul_le_mul_of_nonneg_left (Real.rpow_le_rpow hp.le hpC (by linarith)) hA.le).trans hpower
-  have hratio : A * p ≤ (L ^ J) ^ γ / p ^ γ := by
-    apply (le_div_iff₀ (Real.rpow_pos_of_pos hp γ)).mpr
-    rw [Real.rpow_add hp, Real.rpow_one] at hpow
-    nlinarith [hpow]
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · change c * R ≤ R / p * L ^ J
-    rw [div_mul_eq_mul_div, le_div_iff₀ hp]
-    nlinarith [mul_le_mul_of_nonneg_left hcp hR.le]
-  · change 2 * C * R * L / p ≤ R / p * L ^ J
-    rw [div_mul_eq_mul_div, div_le_div_iff_of_pos_right hp]
-    nlinarith [mul_le_mul_of_nonneg_left htwo hR.le]
-  · change A * p * Q ≤ (R / p * L ^ J) ^ γ
-    rw [Real.mul_rpow (div_nonneg hR.le hp.le) (pow_nonneg hL.le _),
-      Real.div_rpow hR.le hp.le]
-    calc
-      _ ≤ A * p * R ^ γ := mul_le_mul_of_nonneg_left hQR (by positivity)
-      _ ≤ R ^ γ * ((L ^ J) ^ γ / p ^ γ) := by
-        nlinarith [mul_le_mul_of_nonneg_right hratio (Real.rpow_nonneg hR.le γ)]
-      _ = _ := by ring
-  · have hQ' : A * p * Q ≤ Q ^ 2 := by
-      have hpQ := mul_le_mul_of_nonneg_left hpC hA.le
-      have hu : A * p ≤ Q := by nlinarith [hpQ, hlog]
-      nlinarith [mul_le_mul_of_nonneg_right hu hQ0.le]
-    have hh := Real.log_le_log (by positivity : 0 < A * p * Q) hQ'
-    rw [Real.log_pow] at hh
-    norm_num at hh
-    linarith
 
 /-- Enlarging the reciprocal scale by at least `c` accommodates scaling the
 vector by `c`, for every input growth exponent at least one. -/

@@ -1,17 +1,14 @@
 import BakerHarman.SlackSmallDualVector
-import BakerHarman.ReciprocalDetection
 
 /-!
-# A short dual vector from failed reciprocal approximation
+# Small dual vectors at the shifted-sets exponent
 
-Combining Gaussian detection, reciprocal-sum estimates, and dyadic selection
-produces a nonzero dual vector with a small scalar product. All constants are
-chosen before the ambient space and lattice, as required for dimension induction.
+Specialize `bakerHarman_slack_small_dual_vector` to `Q ≤ R ^ gammaBH K`.
+The Gaussian detection and dyadic selection argument is proved in
+`SlackSmallDualVector`.
 -/
 
 namespace BakerHarman
-
-open OAI.Problem337 Classical
 
 /-- If the reciprocal orbit avoids the unit neighborhoods of a separated
 lattice, there is a short dual vector with scalar product `O(R(log Q+1))`.
@@ -30,7 +27,6 @@ theorem bakerHarman_small_dual_vector (d : ℕ) (K : ℝ) (hK : 1 ≤ K) :
   obtain ⟨C, Q₀, R₀, hC, hQ₀, hR₀, h⟩ := bakerHarman_slack_small_dual_vector d K hK
   refine ⟨C, Q₀, R₀, hC, hQ₀, hR₀, ?_⟩
   intro R hR Q hQ hQR
-  exact h R hR Q hQ (hQR.trans (Real.rpow_le_rpow_of_exponent_le
-    (by linarith) (gammaBH_lt_analyticPowerRange K).le))
+  exact h R hR Q hQ (hQR.trans (gammaBH_rpow_le_analyticPowerRange K R (by linarith)))
 
 end BakerHarman
