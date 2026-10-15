@@ -1,37 +1,51 @@
 # Baker–Harman small remainders
 
-A Lean 4 / Mathlib formalisation of equal-weight small remainders, following and
-adapting the strategy of:
+A Lean 4 / Mathlib formalisation of the full unequal-weight Theorem 1 of:
 
 > R. C. Baker and G. Harman, *Small remainder of a vector to suitable modulus*,
 > Math. Z. 221 (1996), 59–71, [doi:10.1007/BF02622099](https://doi.org/10.1007/BF02622099).
 
-The main theorem uses the exponent quoted in Lemma 5 of Heyman–Shparlinski,
+The original theorem is proved with its explicit rounded exponent. A stronger
+version retains the exponent quoted in Lemma 5 of Heyman–Shparlinski,
 *On the greatest common divisor of shifted sets*, J. Number Theory 154 (2015),
 63–73, [doi:10.1016/j.jnt.2015.02.012](https://doi.org/10.1016/j.jnt.2015.02.012).
 
-**Scope:** the equal-weight theorem and a general large-vector lattice
-approximation theorem are proved. This is an adaptation of the original argument,
-not a complete formalisation of the paper's unequal-weight theorem.
+The proof adapts the paper's analytic and lattice strategy. It uses Gaussian
+Fourier detection and an induction with power slack to recover the original
+logarithmic degrees. The equal-weight specialization and earlier lattice theorem
+remain available with their existing statements.
 
 ## Main results
 
-Import `BakerHarman.EqualWeights` for the main application, or `BakerHarman` for
-the entire library. Declarations live in the `BakerHarman` namespace.
+Import `BakerHarman.OriginalTheorem` for the full theorem, or `BakerHarman` for the
+entire library. Declarations live in the `BakerHarman` namespace.
 
-- [`bakerHarman_equal_weights`](BakerHarman/EqualWeights.lean): for `n ≥ 2`,
-  `K ≥ 1`, sufficiently large real `Q,R`, `Q ≤ R^γ(K)`, and a nonnegative real
-  vector `a` with Euclidean norm at most `R^K`, there is a natural modulus
-  `R ≤ r ≤ 2QR` such that `distNearestInt (aᵢ/r) ≤ Q^(-1/n)` for every coordinate.
-  Here `γ(K) = 1 / (2^(2 + max(1,K)) - 4)`.
-- [`bakerHarman_lattice_approximation`](BakerHarman/DimensionInduction.lean):
-  large-vector reciprocal approximation in every positive dimension, uniformly
-  over real inner product spaces and full lattices, with the precise hypotheses
-  recorded in `ReciprocalLatticeStatement`.
-
-The library also contains reciprocal exponential-sum estimates, Gaussian Fourier
-lattice detection, hyperplane lattice geometry, and simultaneous approximation.
-It has no dependency on the shifted-sets project or its Jacobsthal library.
+- [`bakerHarman_theorem_one`](BakerHarman/OriginalTheorem.lean): for every positive
+  dimension `n` and `K > 0`, there are constants `C₁ ≥ 1` and `C₂ > 0` such that,
+  for natural `Q,R` with `C₁ ≤ Q ≤ R^c(K)`, any real vector `a` with Euclidean norm
+  at most `R^K`, and positive tolerances satisfying
+  `ψᵢ ≤ C₂⁻¹(log Q)⁻ⁿ` and `∏ ψᵢ = Q⁻¹`, there is a natural modulus
+  `R ≤ r ≤ 2QR` with `distNearestInt (aᵢ/r) ≤ ψᵢ` for every coordinate.
+  Here `c(K) = 1/(2^(k+1)-4)` and `k = ⌈1 + max(1,K)⌉`, as in equation (2.1).
+  There is no additional hypothesis that `R` exceeds an independent threshold.
+- [`bakerHarman_unequal_weights_log`](BakerHarman/OriginalTheorem.lean) gives the
+  same logarithmic tolerance condition with the stronger exponent
+  `γ(K) = 1/(2^(2 + max(1,K))-4)`. It permits real `Q,R` with `R ≥ 1`.
+- [`bakerHarman_unequal_weights`](BakerHarman/UnequalWeights.lean) gives the
+  intermediate form with tolerances bounded by `c/(log Q + 1)^n` and explicit
+  thresholds for both `Q` and `R`. All real coordinate signs are allowed, and
+  dimension one is included.
+- [`bakerHarman_sharp_lattice_approximation`](BakerHarman/SharpDimensionInduction.lean)
+  proves the supporting lattice theorem with input logarithmic degree `d` and
+  output degree `d−1`, uniformly over real inner product spaces and full lattices.
+  Its precise hypotheses are recorded in `PowerLatticeStatement`. It is valid for
+  every positive power exponent strictly below `(26/25)γ(K)`, for `K ≥ 1`.
+- [`bakerHarman_equal_weights`](BakerHarman/EqualWeights.lean) remains the original
+  entry point for the shifted-sets application: for `n ≥ 2`, `K ≥ 1`, sufficiently
+  large real `Q,R`, and `Q ≤ R^γ(K)`, it gives common tolerance `Q^(-1/n)` for
+  nonnegative vectors of norm at most `R^K`.
+- [`bakerHarman_lattice_approximation`](BakerHarman/DimensionInduction.lean) retains
+  the earlier lattice interface with an existential logarithmic degree.
 
 ## Build and verify
 
@@ -46,12 +60,15 @@ lake env lean scripts/CheckAxioms.lean
 ```
 
 The source check verifies the sixteen vendored files, upstream and local hashes,
-import-only relocation, and exact dependency closure. The axiom audit checks every
+import-only relocation, and exact dependency closure. It works both in a standalone
+checkout and under Lake's `.lake/packages` directory. The axiom audit checks every
 library declaration, including private/generated declarations, and the imported
 `OAI.Problem337` and `OAI.Erdos3` declarations. Only `propext`, `Classical.choice`,
 and `Quot.sound` are allowed; proofs contain no `sorry` or custom axioms.
 
-## Use as a local dependency
+The library has no dependency on the shifted-sets project or its Jacobsthal library.
+
+## Use as a dependency
 
 For a sibling checkout, add this to the consuming project's `lakefile.toml`:
 
@@ -62,101 +79,70 @@ path = "../baker-harman-small-remainders"
 ```
 
 Then run `lake update baker_harman_small_remainders` and import
-`BakerHarman.EqualWeights`. Once published, consumers can replace `path` with
-`git` and a pinned commit in `rev`.
+`BakerHarman.OriginalTheorem`. For a published revision, replace `path` with
+`git = "https://github.com/jasondavies/baker-harman-small-remainders"` and set `rev`
+to the full commit hash containing the results you need.
 
-## Proof and exponent comparison
+## Proof structure and exponent comparison
 
-There is an exponent discrepancy between the shifted-sets lemma and its cited theorem.
-[Baker–Harman, *Small remainder of a vector to suitable modulus*, Math. Z. 221 (1996), 59–71](https://doi.org/10.1007/BF02622099),
-p. 62, equation (2.1), gives `c(K) = 1 / (2^(k + 1) - 4)` with
-`k = ⌈1 + max{K,1}⌉`, and explicitly uses this constant in its Theorem 1.
-The shifted-sets paper's Lemma 5 (p. 67), and our `gammaBH`, instead use
-`γ(K) = 1 / (2^(2 + max{1,K}) - 4)`. For noninteger `K > 1`, this allows a larger
-range `Q ≤ R^γ(K)` than the original theorem supplies: at `K = 3/2`,
-`c(K) = 1/12 ≈ 0.0833`, whereas `γ(K) ≈ 0.1367`.
-Thus the original theorem as stated does not supply the power range used here.
+The paper's explicit exponent uses a rounded derivative order. For noninteger
+`K > 1`, its `c(K)` is smaller than the shifted-sets exponent `γ(K)`; for example,
+at `K = 3/2` they are `1/12` and approximately `0.1367`, respectively.
+[`originalExponent_le_gammaBH`](BakerHarman/OriginalTheorem.lean) proves the
+comparison. The full original theorem follows from the stronger unequal-weight
+result by restricting its power range.
 
-The original **proof**, however, has enough numerical slack to accommodate `γ(K)`.
-Before weakening its estimate to `R^(1-2c(K))`, the exponent pair in Lemma 1 gives
-saving `s(K) = (k - max{1,K}) / (2^k - 2)`.
-[`Exponent.lean`](BakerHarman/Exponent.lean) proves
-`s(K) ≥ 4γ(K)/3`. Choosing the small-sum cutoff `R Q^(-5/4)` in Proposition 3
-leaves a positive margin `s(K) - 5γ(K)/4 ≥ γ(K)/12`; the module also proves that
-any fixed multiple of `R^(1-s(K))` is eventually at most half this cutoff,
-uniformly for `0 < Q ≤ R^γ(K)`. This supplies the exponent bookkeeping needed to
-adapt the original proof without changing `γ`, `κ` or `ϑ`.
-The completed proof below retains that power range through the analytic estimates,
-lattice induction, and final equal-weight approximation.
+[`Exponent.lean`](BakerHarman/Exponent.lean) proves that the exponent pair in the
+original Lemma 1 retains saving at least `4γ(K)/3` before the paper weakens it.
+The implemented analytic argument starts with the second-derivative estimate in
+[`ReciprocalSum.lean`](BakerHarman/ReciprocalSum.lean), develops higher derivatives
+by van der Corput differencing, and combines numerator bands. The resulting
+[`ExponentialSum.lean`](BakerHarman/ExponentialSum.lean) bound has saving `6γ(K)/5`.
+Allowing fixed logarithmic factors in the numerator retains saving `23γ(K)/20`.
 
-The analytic proof starts in
-[`BakerHarman/ReciprocalSum.lean`](BakerHarman/ReciprocalSum.lean).
-It proves the base-order estimate `|Σ e(z/r)| ≤ 252(√R + R²/|z|)` for
-`0 < |z| ≤ R²` on natural subintervals of `[R,2R)`, including real `R ≥ 1`.
-[`BakerHarman/HigherDerivative.lean`](BakerHarman/HigherDerivative.lean)
-also proves explicit bounds at every higher derivative order, using an optimized
-van der Corput induction. [`BakerHarman/PowerBands.lean`](BakerHarman/PowerBands.lean)
-converts them to power savings on explicit numerator bands and combines finite chains
-of overlapping bands. [`BakerHarman/BandSelection.lean`](BakerHarman/BandSelection.lean)
-selects bands covering the full range, and
-[`BakerHarman/ExponentialSum.lean`](BakerHarman/ExponentialSum.lean)
-proves `|Σ e(z/r)| ≤ C(R^(1-6γ(K)/5) + R²/|z|)` for
-`0 < |z| ≤ R^(K+1)`, `K ≥ 1`, on closed integer subintervals of `[R,2R]`.
-Allowing any fixed factor in the numerator range retains saving `23γ(K)/20`
-for sufficiently large `R`. [`BakerHarman/LargeSums.lean`](BakerHarman/LargeSums.lean)
-then proves that a sum of size at least `T ≥ R Q^(-11/10)` has
-`|z| ≤ C R²/T`, uniformly for `0 < Q ≤ R^γ(K)`. This completes the analytic
-input to the lattice argument, using a different saving and cutoff from the
-original exponent-pair bookkeeping above.
-[`BakerHarman/DyadicSelection.lean`](BakerHarman/DyadicSelection.lean)
-proves the finite counting steps: discarding small sums, selecting a dyadic class,
-bounding the number of classes logarithmically, and finding a small scalar product
-or a small difference by the box argument, including singleton classes.
-The derivative, differencing and basic lattice definitions use sixteen Apache-2.0 sources from the
-same pinned `openai/math` revision, in `vendor/baker-harman-analytics`.
-Only their import paths are relocated to avoid overlapping Lake module roots;
-`python3 scripts/check_baker_harman_sources.py` verifies local and upstream hashes,
-the import-only relocation, and the exact dependency closure. The axiom audit below
-also checks every imported declaration in their `OAI.Problem337` and `OAI.Erdos3` namespaces.
+[`PowerSlack.lean`](BakerHarman/PowerSlack.lean) uses the gap
+`23/20 − (11/10)(26/25) = 3/500` to extend the large-sum frequency bound to
+`Q ≤ R^((26/25)γ(K))`. Gaussian detection and dyadic selection then give a short
+dual vector with norm `O(log Q + 1)` and scalar product `O(R(log Q + 1))`.
 
-[`BakerHarman/Lattice/DetectionBudget.lean`](BakerHarman/Lattice/DetectionBudget.lean)
-proves a Gaussian alternative to the original Fourier detection lemma. For any
-dimension `d`, its threshold is uniform over ambient inner product spaces and
-lattices with minimum nonzero length at least one and covolume at most `Q`.
-A finite sequence avoiding the unit neighborhoods has Fourier-sum mass at least
-one quarter of its length among nonzero dual vectors of length `O_d(log Q + 1)`;
-there are at most `O_d(Q(log Q + 1)^d)` such vectors.
-The local `Lattice` modules extract and adapt the required Poisson and integration
-proofs from the same pinned `openai/math` revision, with source attribution and
-the upstream Apache-2.0 license retained. They avoid its unrelated import branches.
-[`BakerHarman/LogFactors.lean`](BakerHarman/LogFactors.lean) absorbs fixed
-logarithmic powers in the numerator range, retaining saving `23γ(K)/20`.
-The small-sum removal lemma also accommodates logarithmic factors in the frequency
-count. [`BakerHarman/SmallDualVector.lean`](BakerHarman/SmallDualVector.lean)
-combines these estimates: failure of reciprocal approximation produces a nonzero
-dual vector of length `O(log Q + 1)` with scalar product `O(R(log Q + 1))`.
-The constants are uniform over ambient spaces and lattices of a fixed dimension.
-[`BakerHarman/DimensionOne.lean`](BakerHarman/DimensionOne.lean)
-proves the one-dimensional large-vector approximation case. The lattice modules
-also prove primitive-normal reduction, the exact hyperplane covolume formula,
-dual norm and covolume lower bounds, scaling, and lifting approximations from a
-scaled hyperplane lattice.
-[`BakerHarman/DimensionInduction.lean`](BakerHarman/DimensionInduction.lean)
-proves the large-vector approximation in every positive dimension, with constants
-and a logarithmic degree depending only on the dimension and `K`. The induction
-preserves `Q ≤ R^γ(K)` exactly; its output interval is bounded by
-`B R Q (log Q + 1)^m / ρ`, where `ρ ≥ 1` is a lower bound for nonzero lattice lengths.
-[`BakerHarman/SimultaneousDirichlet.lean`](BakerHarman/SimultaneousDirichlet.lean)
-proves simultaneous approximation by a finite pigeonhole argument.
-[`BakerHarman/SmallVectorEqualWeights.lean`](BakerHarman/SmallVectorEqualWeights.lean)
-uses it and reciprocal rounding to cover small vectors. Finally, `EqualWeights.lean`
-combines both cases: equal coordinate tolerances absorb the fixed logarithmic powers,
-and both cases produce a modulus in `[R,2QR]`. The shifted-sets application is maintained separately in `gcd-shifted-sets`.
+The earlier induction preserved one power threshold exactly and paid for that
+with larger logarithmic degrees. The new
+[`SharpDimensionInduction.lean`](BakerHarman/SharpDimensionInduction.lean) instead
+allows a slightly larger power exponent in the lower-dimensional problem,
+remaining strictly inside the analytic range. This absorbs the logarithmic
+covolume increase without spending extra logarithms in the reciprocal scale.
+Each induction step costs one logarithm, giving degrees `d` and `d−1`.
+
+[`WeightedCoordinateLattice.lean`](BakerHarman/Lattice/WeightedCoordinateLattice.lean)
+uses the lattice with basis `ψᵢ⁻¹eᵢ`, proves its covolume is `∏ ψᵢ⁻¹`, controls
+its minimum nonzero length, and converts a unit-ball approximation into the
+individual tolerances. For small vectors,
+[`WeightedDirichlet.lean`](BakerHarman/WeightedDirichlet.lean) partitions the
+fractional-part cube into rectangular boxes. The denominator bound is the product
+of their side counts; rounding leaves a uniform positive part of each coordinate's
+error budget. [`WeightedBudget.lean`](BakerHarman/WeightedBudget.lean) proves the
+resulting small-vector case, including dimension one.
+
+[`UnequalWeights.lean`](BakerHarman/UnequalWeights.lean) combines both cases and
+removes the coordinate-sign restriction. Finally,
+[`OriginalTheorem.lean`](BakerHarman/OriginalTheorem.lean) converts `log Q + 1`
+to the paper's `log Q` condition, absorbs the auxiliary `R` threshold into `C₁`,
+and supplies the original rounded exponent and natural-parameter statement.
 
 ## Provenance and license
 
-Extracted from `gcd-shifted-sets` at commit
-`cb6cd4f6c95edab17f182c0dd169625b83c63ad2`. Module paths and namespaces were renamed;
-the proof arguments were preserved. See [NOTICE](NOTICE) for extraction and
-upstream provenance. The project is licensed under [Apache-2.0](LICENSE).
-The original paper is not redistributed.
+The equal-weight library was extracted from `gcd-shifted-sets` at commit
+`cb6cd4f6c95edab17f182c0dd169625b83c63ad2`, preserving its proof arguments while
+renaming module paths and namespaces. The full unequal-weight development was
+added subsequently in this repository. See [NOTICE](NOTICE) for provenance.
+The project is licensed under [Apache-2.0](LICENSE). The original paper is not
+redistributed.
+
+Sixteen analytic and lattice sources come from
+[`openai/math`](https://github.com/openai/math/tree/1581d4cbdd69a0faf34b2089614fe2a814316a6a)
+at revision `1581d4cbdd69a0faf34b2089614fe2a814316a6a`. Only their import paths are
+relocated; their original namespaces remain `OAI.Problem337` and `OAI.Erdos3`.
+Exact upstream provenance and hashes are recorded in
+[vendor/baker-harman-analytics/UPSTREAM.json](vendor/baker-harman-analytics/UPSTREAM.json).
+Additional adapted lattice modules retain individual attribution headers. No
+additional external sources are introduced by the unequal-weight development.
