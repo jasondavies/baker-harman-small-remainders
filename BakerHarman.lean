@@ -54,6 +54,7 @@ import BakerHarman.SmallDualVector
 import BakerHarman.SmallVector
 import BakerHarman.SmallVectorEqualWeights
 import BakerHarman.TheoremTwo
+import BakerHarman.TheoremTwoRange
 import BakerHarman.UnequalWeights
 import BakerHarman.WeightedBudget
 import BakerHarman.WeightedDirichlet

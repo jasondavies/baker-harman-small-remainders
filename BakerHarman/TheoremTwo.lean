@@ -8,11 +8,12 @@ largest tolerance. Retaining that factor in the sharp lattice theorem gives the
 improved modulus bound from equation (1.13).
 
 The paper assumes `K > 0`, which the natural-parameter statement preserves.
-Its substantive range is `K > 1`: with the constants chosen here, the hypotheses
-of that statement are incompatible for `0 < K ≤ 1`. Indeed `ψᵢ ≤ 1` and
-`∏ ψᵢ = Q⁻¹` imply `ψᵢ⁻¹ ≤ Q`, so the weighted maximum is at most `R^K Q`.
-For natural `Q ≥ C₁ ≥ exp 1`, the required lower bound is strictly above `RQ`,
-since `C₂ ≥ 1` and `log Q > 1`.
+`bakerHarman_theorem_two_constants` exports `exp 1 ≤ C₁` and `1 ≤ C₂`.
+For these bounds, the hypotheses are incompatible when `K ≤ 1`:
+`ψᵢ⁻¹ ≤ Q` bounds the weighted maximum by `R^K Q ≤ RQ`, while the required
+lower bound is strictly above `RQ`. `BakerHarman.TheoremTwoRange` proves this
+incompatibility and constructs admissible inputs for every `K > 1` and every
+allowed pair of constants.
 -/
 
 namespace BakerHarman
@@ -66,9 +67,10 @@ theorem bakerHarman_large_weighted_vector (n : ℕ) (hn : 0 < n) (K : ℝ) (hK :
 
 /-- Theorem 2 with the paper's logarithmic hypotheses and the stronger
 shifted-sets exponent. The same `C₂` controls the tolerance bound and the large
-weighted-vector threshold. Real `Q,R` are allowed. -/
-theorem bakerHarman_theorem_two_log (n : ℕ) (hn : 0 < n) (K : ℝ) :
-    ∃ C₁ C₂ C₃ : ℝ, 1 ≤ C₁ ∧ 0 < C₂ ∧ 0 < C₃ ∧
+weighted-vector threshold. Real `Q,R` are allowed. The constant bounds are
+exported explicitly for the K-range lemmas. -/
+theorem bakerHarman_theorem_two_log_constants (n : ℕ) (hn : 0 < n) (K : ℝ) :
+    ∃ C₁ C₂ C₃ : ℝ, Real.exp 1 ≤ C₁ ∧ 1 ≤ C₂ ∧ 0 < C₃ ∧
       ∀ Q R : ℝ, 1 ≤ R → C₁ ≤ Q → Q ≤ R ^ gammaBH K →
       ∀ a ψ : Fin n → ℝ, Real.sqrt (∑ i, (a i) ^ 2) ≤ R ^ K →
       (∀ i, 0 < ψ i) → (∀ i, ψ i ≤ C₂⁻¹ * (Real.log Q)⁻¹ ^ n) →
@@ -83,7 +85,7 @@ theorem bakerHarman_theorem_two_log (n : ℕ) (hn : 0 < n) (K : ℝ) :
   have hC₂1 : 1 ≤ C₂ := le_max_left _ _
   have hC₂ : 0 < C₂ := by linarith
   refine ⟨max Q₀ (max R₀ (Real.exp 1)), C₂, B * (2 : ℝ) ^ (n - 1),
-    hQ₀.trans (le_max_left _ _), hC₂, by positivity, ?_⟩
+    (le_max_right _ _).trans (le_max_right _ _), hC₂1, by positivity, ?_⟩
   intro Q R hR hQ hQR a ψ ha hψ hψupper hprod hlarge
   have hR0 : 0 < R := by linarith
   obtain ⟨hQ₀Q, hR₀R, hlog⟩ := paper_parameter_bounds K Q₀ R₀ Q R hR hQ hQR
@@ -117,11 +119,48 @@ theorem bakerHarman_theorem_two_log (n : ℕ) (hn : 0 < n) (K : ℝ) :
     (show 0 ≤ B * R * Q * coordinateMax hn ψ by positivity)
   nlinarith only [hh]
 
+/-- The real-parameter Theorem 2 interface, retaining its original statement. -/
+theorem bakerHarman_theorem_two_log (n : ℕ) (hn : 0 < n) (K : ℝ) :
+    ∃ C₁ C₂ C₃ : ℝ, 1 ≤ C₁ ∧ 0 < C₂ ∧ 0 < C₃ ∧
+      ∀ Q R : ℝ, 1 ≤ R → C₁ ≤ Q → Q ≤ R ^ gammaBH K →
+      ∀ a ψ : Fin n → ℝ, Real.sqrt (∑ i, (a i) ^ 2) ≤ R ^ K →
+      (∀ i, 0 < ψ i) → (∀ i, ψ i ≤ C₂⁻¹ * (Real.log Q)⁻¹ ^ n) →
+      (∏ i, ψ i) = Q⁻¹ →
+      C₂ * R * Q * (Real.log Q) ^ n ≤ coordinateMax hn (fun i => |a i| / ψ i) →
+      ∃ r : ℕ, R ≤ r ∧
+        (r : ℝ) ≤ C₃ * R * Q * (Real.log Q) ^ (n - 1) * coordinateMax hn ψ ∧
+        ∀ i, distNearestInt (a i / r) ≤ ψ i := by
+  obtain ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, h⟩ :=
+    bakerHarman_theorem_two_log_constants n hn K
+  exact ⟨C₁, C₂, C₃, (Real.one_le_exp (by norm_num)).trans hC₁,
+    lt_of_lt_of_le zero_lt_one hC₂, hC₃, h⟩
+
 /-- **Baker–Harman, Theorem 2** (1996), equations (1.12)–(1.13), with
 its original power exponent. All constants depend only on the dimension and
 `K`; arbitrary real coordinate signs and dimension one are included.
 The `0 < K` argument matches the paper; for the constants constructed here, the
 hypotheses can only hold when `K > 1` (see the module documentation). -/
+theorem bakerHarman_theorem_two_constants (n : ℕ) (hn : 0 < n) (K : ℝ) (_hK : 0 < K) :
+    ∃ C₁ C₂ C₃ : ℝ, Real.exp 1 ≤ C₁ ∧ 1 ≤ C₂ ∧ 0 < C₃ ∧
+      ∀ Q R : ℕ, C₁ ≤ Q → (Q : ℝ) ≤ (R : ℝ) ^ originalExponent K →
+      ∀ a ψ : Fin n → ℝ, Real.sqrt (∑ i, (a i) ^ 2) ≤ (R : ℝ) ^ K →
+      (∀ i, 0 < ψ i) → (∀ i, ψ i ≤ C₂⁻¹ * (Real.log Q)⁻¹ ^ n) →
+      (∏ i, ψ i) = (Q : ℝ)⁻¹ →
+      C₂ * R * Q * (Real.log Q) ^ n ≤ coordinateMax hn (fun i => |a i| / ψ i) →
+      ∃ r : ℕ, R ≤ r ∧
+        (r : ℝ) ≤ C₃ * R * Q * (Real.log Q) ^ (n - 1) * coordinateMax hn ψ ∧
+        ∀ i, distNearestInt (a i / r) ≤ ψ i := by
+  obtain ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, h⟩ := bakerHarman_theorem_two_log_constants n hn K
+  refine ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, ?_⟩
+  intro Q R hQ hQR a ψ ha hψ hψupper hprod hlarge
+  obtain ⟨hR1, hQR'⟩ := originalExponent_nat_parameters K Q R
+    ((Real.one_le_exp (by norm_num)).trans (hC₁.trans hQ)) hQR
+  obtain ⟨r, hr, hrupper, herr⟩ := h Q R hR1 hQ hQR' a ψ ha hψ hψupper hprod hlarge
+  exact ⟨r, by exact_mod_cast hr, hrupper, herr⟩
+
+/-- The original paper-facing Theorem 2 interface. The stronger constant
+bounds are available in `bakerHarman_theorem_two_constants`. Its `0 < K`
+argument retains the paper's stated range. -/
 theorem bakerHarman_theorem_two (n : ℕ) (hn : 0 < n) (K : ℝ) (_hK : 0 < K) :
     ∃ C₁ C₂ C₃ : ℝ, 1 ≤ C₁ ∧ 0 < C₂ ∧ 0 < C₃ ∧
       ∀ Q R : ℕ, C₁ ≤ Q → (Q : ℝ) ≤ (R : ℝ) ^ originalExponent K →
@@ -132,11 +171,9 @@ theorem bakerHarman_theorem_two (n : ℕ) (hn : 0 < n) (K : ℝ) (_hK : 0 < K) :
       ∃ r : ℕ, R ≤ r ∧
         (r : ℝ) ≤ C₃ * R * Q * (Real.log Q) ^ (n - 1) * coordinateMax hn ψ ∧
         ∀ i, distNearestInt (a i / r) ≤ ψ i := by
-  obtain ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, h⟩ := bakerHarman_theorem_two_log n hn K
-  refine ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, ?_⟩
-  intro Q R hQ hQR a ψ ha hψ hψupper hprod hlarge
-  obtain ⟨hR1, hQR'⟩ := originalExponent_nat_parameters K Q R (hC₁.trans hQ) hQR
-  obtain ⟨r, hr, hrupper, herr⟩ := h Q R hR1 hQ hQR' a ψ ha hψ hψupper hprod hlarge
-  exact ⟨r, by exact_mod_cast hr, hrupper, herr⟩
+  obtain ⟨C₁, C₂, C₃, hC₁, hC₂, hC₃, h⟩ :=
+    bakerHarman_theorem_two_constants n hn K _hK
+  exact ⟨C₁, C₂, C₃, (Real.one_le_exp (by norm_num)).trans hC₁,
+    lt_of_lt_of_le zero_lt_one hC₂, hC₃, h⟩
 
 end BakerHarman

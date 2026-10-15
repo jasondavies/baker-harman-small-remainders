@@ -18,7 +18,8 @@ remain available with their existing statements.
 ## Main results
 
 Import `BakerHarman.OriginalTheorem` for Theorem 1, `BakerHarman.TheoremTwo` for
-both theorems, or `BakerHarman` for the entire library. Declarations live in the
+both theorems, or `BakerHarman` for the entire library. Import
+`BakerHarman.TheoremTwoRange` for the K-range lemmas. Declarations live in the
 `BakerHarman` namespace.
 
 - [`bakerHarman_theorem_one`](BakerHarman/OriginalTheorem.lean): for every positive
@@ -39,10 +40,16 @@ both theorems, or `BakerHarman` for the entire library. Declarations live in the
   The shared `C₂` matches the printed tolerance bound and equation (1.12).
   Arbitrary real coordinate signs and dimension one are included.
 
-  The substantive range is **`K > 1`**. The signature retains the paper's `K > 0`,
-  but for the constants chosen in the proof, the hypotheses are incompatible
-  when `0 < K ≤ 1`: the weighted maximum is at most `R^K Q ≤ RQ`, whereas the
-  large-vector hypothesis requires it to exceed `RQ`.
+  The substantive range is **`K > 1`**. The signature retains the paper's `K > 0`.
+  [`bakerHarman_theorem_two_constants`](BakerHarman/TheoremTwo.lean) additionally
+  exports `exp 1 ≤ C₁` and `1 ≤ C₂`; the original interface is its corollary.
+- [`TheoremTwoRange.lean`](BakerHarman/TheoremTwoRange.lean) formalises both sides
+  of the K-range claim using `TheoremTwoAdmissible`, which records the theorem's
+  `Q,R,a,ψ` hypotheses. `bakerHarman_theorem_two_admissible` connects this predicate
+  to the theorem. `theoremTwo_not_admissible` rules out inputs for `K ≤ 1` whenever `exp 1 ≤ C₁` and `1 ≤ C₂`.
+  `theoremTwo_admissible_exists` supplies inputs for every `K > 1`, every
+  `C₁ ≥ 1`, and every `C₂ > 0`, with arbitrarily large natural `R`. It uses equal
+  tolerances and a vector supported in one coordinate.
 - [`bakerHarman_theorem_two_log`](BakerHarman/TheoremTwo.lean) gives Theorem 2
   with the stronger exponent `γ(K)` and real `Q,R`. The supporting
   `bakerHarman_large_weighted_vector` retains `log Q + 1`, separate thresholds,
@@ -151,10 +158,14 @@ and supplies the original rounded exponent and natural-parameter statement.
 
 The shared `bakerHarman_weighted_lattice_approximation` in
 [`UnequalWeights.lean`](BakerHarman/UnequalWeights.lean) handles any `ρ ≥ 1` with
-`ρψᵢ ≤ 1`. Theorem 1 chooses `ρ = (log Q + 1)ⁿ/c`, while
+`ρψᵢ ≤ 1`. The large-vector branch of `bakerHarman_unequal_weights_nonneg`
+chooses `ρ = (log Q + 1)ⁿ/c`, where `c` is that theorem's auxiliary tolerance
+constant. It is distinct from the paper-facing constant `C₂`.
+
 [`TheoremTwo.lean`](BakerHarman/TheoremTwo.lean) chooses `ρ⁻¹ = maxᵢ ψᵢ`.
-The maximum weighted coordinate is bounded by the weighted Euclidean norm, so the paper's large-vector hypothesis
-supplies the required norm threshold. The same logarithmic conversion and
+The maximum weighted coordinate is bounded by the weighted Euclidean norm, so
+the paper's large-vector hypothesis supplies the required norm threshold. The
+same logarithmic conversion and
 threshold absorption give Theorem 2 with its original constants and degrees.
 
 ## Provenance and license

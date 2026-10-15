@@ -50,18 +50,26 @@ lemma originalExponent_nat_parameters (K : ℝ) (Q R : ℕ)
 
 /-- Absorb the separate thresholds for `Q,R` into the paper's single lower
 bound on `Q`, also ensuring `1 ≤ log Q`. -/
-lemma paper_parameter_bounds (K Q₀ R₀ Q R : ℝ) (hR : 1 ≤ R)
-    (hQ : max Q₀ (max R₀ (Real.exp 1)) ≤ Q) (hQR : Q ≤ R ^ gammaBH K) :
+lemma logarithmic_parameter_bounds (γ Q₀ R₀ Q R : ℝ) (hγ : γ ≤ 1) (hR : 1 ≤ R)
+    (hQ : max Q₀ (max R₀ (Real.exp 1)) ≤ Q) (hQR : Q ≤ R ^ γ) :
     Q₀ ≤ Q ∧ R₀ ≤ R ∧ 1 ≤ Real.log Q := by
   have hQ₀Q : Q₀ ≤ Q := (le_max_left _ _).trans hQ
   have hR₀Q : R₀ ≤ Q := (le_max_left _ _).trans ((le_max_right _ _).trans hQ)
   have hexpQ : Real.exp 1 ≤ Q := (le_max_right _ _).trans ((le_max_right _ _).trans hQ)
   have hQleR : Q ≤ R := hQR.trans (by
     simpa only [Real.rpow_one] using Real.rpow_le_rpow_of_exponent_le hR
-      (show gammaBH K ≤ 1 by linarith [gammaBH_le K]))
+      hγ)
   refine ⟨hQ₀Q, hR₀Q.trans hQleR, ?_⟩
   have hh := Real.log_le_log (Real.exp_pos 1) hexpQ
   simpa only [Real.log_exp] using hh
+
+/-- Compatibility specialization of `logarithmic_parameter_bounds` to
+`gammaBH K`. -/
+lemma paper_parameter_bounds (K Q₀ R₀ Q R : ℝ) (hR : 1 ≤ R)
+    (hQ : max Q₀ (max R₀ (Real.exp 1)) ≤ Q) (hQR : Q ≤ R ^ gammaBH K) :
+    Q₀ ≤ Q ∧ R₀ ≤ R ∧ 1 ≤ Real.log Q := by
+  exact logarithmic_parameter_bounds (gammaBH K) Q₀ R₀ Q R
+    (by linarith [gammaBH_le K]) hR hQ hQR
 
 /-- Replace powers of `log Q + 1` by powers of `log Q` above the paper's
 logarithmic threshold. -/
@@ -75,11 +83,10 @@ lemma logarithmic_tolerance_conversion (n : ℕ) (c Q : ℝ) (hc : 0 < c)
     ((2 : ℝ) ^ n / c)⁻¹ * (Real.log Q)⁻¹ ^ n ≤ c / (Real.log Q + 1) ^ n := by
   have hlog0 : 0 < Real.log Q := by linarith
   have hden : 0 < (Real.log Q + 1) ^ n := pow_pos (by linarith) _
-  have hp : (Real.log Q + 1) ^ n ≤ (2 * Real.log Q) ^ n :=
-    by simpa only [mul_pow] using log_add_one_pow_le_two_mul_log_pow Q hlog n
+  have hp := log_add_one_pow_le_two_mul_log_pow Q hlog n
   calc
-    _ = c / (2 * Real.log Q) ^ n := by
-      rw [inv_div, mul_pow, inv_pow]
+    _ = c / ((2 : ℝ) ^ n * (Real.log Q) ^ n) := by
+      rw [inv_div, inv_pow]
       ring
     _ ≤ _ := div_le_div_of_nonneg_left hc.le hden hp
 
