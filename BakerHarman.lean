@@ -53,6 +53,7 @@ import BakerHarman.SlackSmallDualVector
 import BakerHarman.SmallDualVector
 import BakerHarman.SmallVector
 import BakerHarman.SmallVectorEqualWeights
+import BakerHarman.TheoremTwo
 import BakerHarman.UnequalWeights
 import BakerHarman.WeightedBudget
 import BakerHarman.WeightedDirichlet

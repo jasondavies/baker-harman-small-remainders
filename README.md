@@ -1,12 +1,12 @@
 # Baker–Harman small remainders
 
-A Lean 4 / Mathlib formalisation of the full unequal-weight Theorem 1 of:
+A Lean 4 / Mathlib formalisation of the full unequal-weight Theorems 1 and 2 of:
 
 > R. C. Baker and G. Harman, *Small remainder of a vector to suitable modulus*,
 > Math. Z. 221 (1996), 59–71, [doi:10.1007/BF02622099](https://doi.org/10.1007/BF02622099).
 
-The original theorem is proved with its explicit rounded exponent. A stronger
-version retains the exponent quoted in Lemma 5 of Heyman–Shparlinski,
+Both original theorems are proved with their explicit rounded exponent. Stronger
+versions retain the exponent quoted in Lemma 5 of Heyman–Shparlinski,
 *On the greatest common divisor of shifted sets*, J. Number Theory 154 (2015),
 63–73, [doi:10.1016/j.jnt.2015.02.012](https://doi.org/10.1016/j.jnt.2015.02.012).
 
@@ -17,8 +17,8 @@ remain available with their existing statements.
 
 ## Main results
 
-Import `BakerHarman.OriginalTheorem` for the full theorem, or `BakerHarman` for the
-entire library. Declarations live in the `BakerHarman` namespace.
+Import `BakerHarman.OriginalTheorem` for Theorem 1, `BakerHarman.TheoremTwo` for
+both theorems, or `BakerHarman` for the entire library. Declarations live in the `BakerHarman` namespace.
 
 - [`bakerHarman_theorem_one`](BakerHarman/OriginalTheorem.lean): for every positive
   dimension `n` and `K > 0`, there are constants `C₁ ≥ 1` and `C₂ > 0` such that,
@@ -28,6 +28,18 @@ entire library. Declarations live in the `BakerHarman` namespace.
   `R ≤ r ≤ 2QR` with `distNearestInt (aᵢ/r) ≤ ψᵢ` for every coordinate.
   Here `c(K) = 1/(2^(k+1)-4)` and `k = ⌈1 + max(1,K)⌉`, as in equation (2.1).
   There is no additional hypothesis that `R` exceeds an independent threshold.
+- [`bakerHarman_theorem_two`](BakerHarman/TheoremTwo.lean) gives the improved
+  modulus bound for large weighted vectors. Under the same types of hypotheses,
+  with constants depending only on `n,K`, assume additionally
+  `maxᵢ |aᵢ|/ψᵢ ≥ C₂ RQ(log Q)ⁿ`. Then the modulus satisfies
+  `R ≤ r ≤ C₃ RQ(log Q)ⁿ⁻¹ maxᵢ ψᵢ`, with all coordinate errors at most `ψᵢ`.
+  The same `C₂` appears in the tolerance restriction and the large-vector
+  hypothesis, matching equations (1.12)–(1.13). Arbitrary real coordinate signs
+  and dimension one are included.
+- [`bakerHarman_theorem_two_log`](BakerHarman/TheoremTwo.lean) gives Theorem 2
+  with the stronger exponent `γ(K)` and real `Q,R`. The supporting
+  `bakerHarman_large_weighted_vector` retains `log Q + 1`, separate thresholds,
+  and only the tolerance restriction `ψᵢ ≤ 1`.
 - [`bakerHarman_unequal_weights_log`](BakerHarman/OriginalTheorem.lean) gives the
   same logarithmic tolerance condition with the stronger exponent
   `γ(K) = 1/(2^(2 + max(1,K))-4)`. It permits real `Q,R` with `R ≥ 1`.
@@ -79,7 +91,7 @@ path = "../baker-harman-small-remainders"
 ```
 
 Then run `lake update baker_harman_small_remainders` and import
-`BakerHarman.OriginalTheorem`. For a published revision, replace `path` with
+`BakerHarman.TheoremTwo`. For a published revision, replace `path` with
 `git = "https://github.com/jasondavies/baker-harman-small-remainders"` and set `rev`
 to the full commit hash containing the results you need.
 
@@ -89,8 +101,8 @@ The paper's explicit exponent uses a rounded derivative order. For noninteger
 `K > 1`, its `c(K)` is smaller than the shifted-sets exponent `γ(K)`; for example,
 at `K = 3/2` they are `1/12` and approximately `0.1367`, respectively.
 [`originalExponent_le_gammaBH`](BakerHarman/OriginalTheorem.lean) proves the
-comparison. The full original theorem follows from the stronger unequal-weight
-result by restricting its power range.
+comparison. Both original theorems follow from their stronger versions by
+restricting the power range.
 
 [`Exponent.lean`](BakerHarman/Exponent.lean) proves that the exponent pair in the
 original Lemma 1 retains saving at least `4γ(K)/3` before the paper weakens it.
@@ -128,6 +140,12 @@ removes the coordinate-sign restriction. Finally,
 [`OriginalTheorem.lean`](BakerHarman/OriginalTheorem.lean) converts `log Q + 1`
 to the paper's `log Q` condition, absorbs the auxiliary `R` threshold into `C₁`,
 and supplies the original rounded exponent and natural-parameter statement.
+
+[`TheoremTwo.lean`](BakerHarman/TheoremTwo.lean) retains the lattice separation
+factor `ρ⁻¹ = maxᵢ ψᵢ` in the sharp lattice bound. The maximum weighted coordinate
+is bounded by the weighted Euclidean norm, so the paper's large-vector hypothesis
+supplies the required norm threshold. The same logarithmic conversion and
+threshold absorption give Theorem 2 with its original constants and degrees.
 
 ## Provenance and license
 
