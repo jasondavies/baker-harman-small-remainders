@@ -1,0 +1,101 @@
+{
+  "repository": "https://github.com/openai/math",
+  "revision": "1581d4cbdd69a0faf34b2089614fe2a814316a6a",
+  "source_root": "lean",
+  "entrypoints": [
+    "BakerHarmanAnalytics.SecondDerivativeTest",
+    "BakerHarmanAnalytics.CorrelationPhase",
+    "BakerHarmanAnalytics.ReciprocalPhaseRegularity",
+    "BakerHarmanAnalytics.LatticeHyperplaneBasis"
+  ],
+  "upstream_lean": "4.34.1",
+  "local_lean": "4.34.0",
+  "files": {
+    "BakerHarmanAnalytics/CorrelationPhase.lean": "d4a07940960daf849952c19a97a6b49f21161b43efb306acca2268b0f6b5ac09",
+    "BakerHarmanAnalytics/DiscreteFirstDerivative.lean": "16e33facfd95cca6e614ae246174282e83cb1a185da7cdcfca8242b886217518",
+    "BakerHarmanAnalytics/DiscreteSecondDerivative.lean": "dea0d7326e1d40b9420d154c0c8c52daee687a3a3bbba38dc3a25c62f59d1654",
+    "BakerHarmanAnalytics/ForwardDifference.lean": "ef7cdaf0f1389b33b969fe0746305f131bfcc842f39d16c39b6040fd031bc8e4",
+    "BakerHarmanAnalytics/FourierSecondMoment.lean": "4297df7f4a50cc4c89e50e0f378e6fba419084251e38543a7a29bf2949325f5d",
+    "BakerHarmanAnalytics/IteratedDifferencing.lean": "a2a397a151c728b779d4e69d23dc3e38a3ab2b9c775c1494c2802cb6172cf3e6",
+    "BakerHarmanAnalytics/MonotoneBlocks.lean": "c899e9d6f2111a7384cb2fc28feb5d9d93d2eeb125b6d369fc5e6b69588bae74",
+    "BakerHarmanAnalytics/PhaseExtension.lean": "b70860cae7247ee9d75b92934aa7bd4f9d4af259efffee393cd8bfaf5f8b9e79",
+    "BakerHarmanAnalytics/ReciprocalDerivatives.lean": "40d2ce067d724a0338b2fba1c5cb6262a4d99d51973b7e5ebbb90767d6987ba6",
+    "BakerHarmanAnalytics/ReciprocalPhaseRegularity.lean": "77edd8f28604b28060dc58008551be1e2076e12452cc90c8ee7f216f9b169b83",
+    "BakerHarmanAnalytics/SecondDerivativeBudget.lean": "209e56b198ad61ba160b8ac0653feb48f28c8c289846dea17369df2724914a80",
+    "BakerHarmanAnalytics/SecondDerivativeTest.lean": "1e11d35eeabfffd5febe4672735a5748e0359b2d260c212c8a1f6191589c8283",
+    "BakerHarmanAnalytics/SecondDifference.lean": "d8f5296158a4c7b3605d02e1c518fc744b13354b9a7b8ac47d734c9502bc9f28",
+    "BakerHarmanAnalytics/SeparatedIntervalCount.lean": "30b551b91f80c796c876812275fa8707d0de6a06f11ffd1efca13702f2919b8d",
+    "BakerHarmanAnalytics/VanDerCorput.lean": "c936eed4dfea21250204c1fea556d97c7143e4acc904c8227108b2b6a00f527d",
+    "BakerHarmanAnalytics/LatticeHyperplaneBasis.lean": "6cd45054127392ee3a19433983f90fb42d675c07f10caec30ee1f7ec62140f94"
+  },
+  "upstream_files": {
+    "BakerHarmanAnalytics/CorrelationPhase.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/CorrelationPhase.lean",
+      "sha256": "b6ab27f72526ffd1a8b60632cc1adf740b829c1759721117bc691f75ff71e8cc"
+    },
+    "BakerHarmanAnalytics/DiscreteFirstDerivative.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/DiscreteFirstDerivative.lean",
+      "sha256": "16e33facfd95cca6e614ae246174282e83cb1a185da7cdcfca8242b886217518"
+    },
+    "BakerHarmanAnalytics/DiscreteSecondDerivative.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/DiscreteSecondDerivative.lean",
+      "sha256": "a9f65f663ad2de247972397fb187bb3c84fab0e5d9bece86b7c5008e184ca1ba"
+    },
+    "BakerHarmanAnalytics/ForwardDifference.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/ForwardDifference.lean",
+      "sha256": "42bed25646d0a2464d904f0ba2ce9fc1af944f9a39d01d1f22555e004fe7c2df"
+    },
+    "BakerHarmanAnalytics/FourierSecondMoment.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/FourierSecondMoment.lean",
+      "sha256": "4297df7f4a50cc4c89e50e0f378e6fba419084251e38543a7a29bf2949325f5d"
+    },
+    "BakerHarmanAnalytics/IteratedDifferencing.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/IteratedDifferencing.lean",
+      "sha256": "43305e2b9868cb361d91e76347e4c0e5644c02ca0fc00c5e8c30b205ec7fc884"
+    },
+    "BakerHarmanAnalytics/MonotoneBlocks.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/MonotoneBlocks.lean",
+      "sha256": "c899e9d6f2111a7384cb2fc28feb5d9d93d2eeb125b6d369fc5e6b69588bae74"
+    },
+    "BakerHarmanAnalytics/PhaseExtension.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/PhaseExtension.lean",
+      "sha256": "b70860cae7247ee9d75b92934aa7bd4f9d4af259efffee393cd8bfaf5f8b9e79"
+    },
+    "BakerHarmanAnalytics/ReciprocalDerivatives.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/ReciprocalDerivatives.lean",
+      "sha256": "40d2ce067d724a0338b2fba1c5cb6262a4d99d51973b7e5ebbb90767d6987ba6"
+    },
+    "BakerHarmanAnalytics/ReciprocalPhaseRegularity.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/ReciprocalPhaseRegularity.lean",
+      "sha256": "1492c957378fc220dc41480f31deefe020ed2c8f435dab625c5c3e0feea877bf"
+    },
+    "BakerHarmanAnalytics/SecondDerivativeBudget.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/SecondDerivativeBudget.lean",
+      "sha256": "209e56b198ad61ba160b8ac0653feb48f28c8c289846dea17369df2724914a80"
+    },
+    "BakerHarmanAnalytics/SecondDerivativeTest.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/SecondDerivativeTest.lean",
+      "sha256": "4b754a0fa1c2ff6758b9f4824c7539588dd0130e8e3b276e9e8e78efba1f4bfa"
+    },
+    "BakerHarmanAnalytics/SecondDifference.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/SecondDifference.lean",
+      "sha256": "d8f5296158a4c7b3605d02e1c518fc744b13354b9a7b8ac47d734c9502bc9f28"
+    },
+    "BakerHarmanAnalytics/SeparatedIntervalCount.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/SeparatedIntervalCount.lean",
+      "sha256": "30b551b91f80c796c876812275fa8707d0de6a06f11ffd1efca13702f2919b8d"
+    },
+    "BakerHarmanAnalytics/VanDerCorput.lean": {
+      "path": "lean/OAI/NumberTheory/EgyptianFractions/VanDerCorput.lean",
+      "sha256": "bb5de8d2bab045e97bdd93e93bca726598780f73be857d332e0090b0361eaca4"
+    },
+    "BakerHarmanAnalytics/LatticeHyperplaneBasis.lean": {
+      "path": "lean/OAI/Combinatorics/Progressions/Lattices/LatticeHyperplaneBasis.lean",
+      "sha256": "6cd45054127392ee3a19433983f90fb42d675c07f10caec30ee1f7ec62140f94"
+    }
+  },
+  "import_rewrite": {
+    "from": "OAI.NumberTheory.EgyptianFractions.",
+    "to": "BakerHarmanAnalytics."
+  }
+}

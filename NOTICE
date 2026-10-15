@@ -1,0 +1,15 @@
+Baker–Harman small remainders
+
+Extracted from gcd-shifted-sets at commit
+cb6cd4f6c95edab17f182c0dd169625b83c63ad2.
+The extraction changes module paths and the ShiftedGcd namespace to BakerHarman,
+and separates the two shared definitions; it does not change the proof arguments.
+
+This project includes and adapts portions of OpenAI's math repository:
+https://github.com/openai/math
+Revision: 1581d4cbdd69a0faf34b2089614fe2a814316a6a
+Licensed under the Apache License, Version 2.0.
+
+The sixteen vendored analytic sources retain exact upstream provenance and hashes
+in vendor/baker-harman-analytics/UPSTREAM.json. Only their import paths are relocated.
+Adapted lattice sources carry individual upstream attribution in their headers.
