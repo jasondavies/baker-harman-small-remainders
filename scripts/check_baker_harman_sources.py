@@ -8,7 +8,8 @@ import re
 root = Path(__file__).resolve().parents[1] / 'vendor' / 'baker-harman-analytics'
 manifest = json.loads((root / 'UPSTREAM.json').read_text())
 expected = manifest['files']
-actual = {str(p.relative_to(root)) for p in root.rglob('*.lean') if '.lake' not in p.parts}
+actual = {str(p.relative_to(root)) for p in root.rglob('*.lean')
+          if '.lake' not in p.relative_to(root).parts}
 if actual != set(expected):
     raise SystemExit(f'Source set mismatch: missing={set(expected) - actual}, extra={actual - set(expected)}')
 
