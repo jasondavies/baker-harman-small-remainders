@@ -77,7 +77,7 @@ both theorems, or `BakerHarman` for the entire library. Import
 
 ## Build and verify
 
-Install Lean through Elan; `lean-toolchain` pins Lean 4.34.0 and the Lake manifest
+Install Lean through Elan; `lean-toolchain` pins Lean 4.35.0 and the Lake manifest
 pins Mathlib and its dependencies. From this directory run:
 
 ```sh

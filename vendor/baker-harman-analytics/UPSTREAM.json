@@ -9,7 +9,7 @@
     "BakerHarmanAnalytics.LatticeHyperplaneBasis"
   ],
   "upstream_lean": "4.34.1",
-  "local_lean": "4.34.0",
+  "local_lean": "4.35.0",
   "files": {
     "BakerHarmanAnalytics/CorrelationPhase.lean": "d4a07940960daf849952c19a97a6b49f21161b43efb306acca2268b0f6b5ac09",
     "BakerHarmanAnalytics/DiscreteFirstDerivative.lean": "16e33facfd95cca6e614ae246174282e83cb1a185da7cdcfca8242b886217518",
@@ -99,6 +99,6 @@
     "to": "BakerHarmanAnalytics."
   },
   "config_files": {
-    "lakefile.toml": "dbdbc481ea24c3280689d4c6cbca539168cb9e933ee648c8fb4d0c6d4b046777"
+    "lakefile.toml": "9fc957cf2489b3ce019b011d721c344f7968da668c04ffebff9f14a0cfc28a60"
   }
 }
