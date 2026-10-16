@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: leanprover/lean-action@v1
+        with:
+          use-mathlib-cache: true
+      - name: Check vendored sources
+        run: python3 scripts/check_baker_harman_sources.py
+      - name: Audit axioms
+        run: lake env lean scripts/CheckAxioms.lean
+      - name: Test the audits
+        run: python3 -m unittest discover -s scripts -p 'test_*.py'
